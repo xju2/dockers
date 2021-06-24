@@ -206,7 +206,7 @@ RUN mkdir /code && cd /code \
 
 # Pythia 8.302
 RUN mkdir /code && cd /code \
-    && wget http://home.thep.lu.se/~torbjorn/pythia8/pythia8302.tgz -O- | tar xz \
+    && wget https://pythia.org/download/pythia83/pythia8302.tgz -O- | tar xz \
     && cd pythia*/ && ./configure --with-fastjet3=/usr/local \
 					--with-hepmc2=/usr/local --with-lhapdf6=/usr/local \
 					--with-root-bin=/usr/local/root/bin --with-root-lib=/usr/local/root/lib/root \
