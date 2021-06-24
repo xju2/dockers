@@ -1,4 +1,4 @@
-## this is docexoty/exatrkx:tf2.4-torch1.7.0-cuda11.0.3-ubuntu20.04
+## this is not yet tested...
 # python -c "import torch; print(torch.__version__)"
 # python -c "import torch; print(torch.version.cuda)"
 
