@@ -1,0 +1,21 @@
+channels:
+    - nvidia
+    - pytorch
+    - conda-forge
+dependencies:  
+- pytorch==1.7.1
+- cmake
+- mpi4py
+- s3fs
+- pip
+- pip:
+    - tensorboard==2.4
+    - tensorflow-gpu==2.4
+    - line_profiler
+    - memory_profiler
+    - jupyter-tensorboard
+    - torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
+    - torch-sparse==0.6.9 --no-cache-dir -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
+    - torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+    - torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+    - torch-geometric
