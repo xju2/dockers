@@ -5,8 +5,8 @@ ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
 
 RUN apt-get update -y  && DEBIAN_FRONTEND="noninteractive" TZ="America/Los_Angeles"  apt-get -y install vim
 
-COPY environment.yml /rapids/
-RUN /bin/bash -c cd ${RAPIDS_DIR}   && source activate rapids && conda env update --file=/rapids/environment.yml
+COPY environments.yml /rapids/
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids && conda env update --file=/rapids/environments.yml
 
 # RUN HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=1 \
 #     HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \

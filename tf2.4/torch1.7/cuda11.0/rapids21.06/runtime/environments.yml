@@ -1,8 +1,11 @@
 channels:
+    - rapidsai-nightly
     - nvidia
     - pytorch
     - conda-forge
-dependencies:  
+dependencies:
+- gxx_linux-64=9.3.*
+- nccl
 - pytorch==1.7.1
 - cmake
 - mpi4py
@@ -15,7 +18,7 @@ dependencies:
     - memory_profiler
     - jupyter-tensorboard
     - torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
-    - torch-sparse==0.6.9 --no-cache-dir -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
+    - torch-sparse==0.6.9 -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
     - torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
     - torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
     - torch-geometric

@@ -1,4 +1,4 @@
-## this is for docexoty/exatrkx:tf2.4-torch1.7.1-cuda11.0.3-ubuntu20.04
+## this is for docexoty/exatrkx:tf2.4-torch1.7.1-cuda11.0.3-ubuntu20.04-rapids20.06
 # python -c "import torch; print(torch.__version__)"
 # python -c "import torch; print(torch.version.cuda)"
 

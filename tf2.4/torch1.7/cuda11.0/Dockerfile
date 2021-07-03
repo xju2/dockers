@@ -55,3 +55,20 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          nsight-compute-2021.1 && \
      rm -rf /var/lib/apt/lists/*
+
+
+# cugraph
+RUN mkdir /code && cd /code \
+    && wget https://github.com/rapidsai/cugraph/archive/refs/tags/v21.06.00.tar.gz -O- | tar xz \
+    && cd cugraph-21.06.00 && mkdir build && cd build \
+    && cmake ../cpp -DCMAKE_INSTALL_PREFIX=/usr/local \
+          -DCMAKE_CUDA_ARCHITECTURES="ALL" \
+          -DDISABLE_DEPRECATION_WARNING=ON \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_STATIC_FAISS=OFF \
+          -DBUILD_CUGRAPH_MG_TESTS=ON \
+    && cmake --build . --target install -- -j10 \
+    && cd ../python \
+    && CUGRAPH_BUILD_PATH=/code/cugraph-21.06.00/build python setup.py build_ext --inplace --library-dir=/code/cugraph-21.06.00/build \
+    && CUGRAPH_BUILD_PATH=/code/cugraph-21.06.00/build python setup.py install --user \
+    && cd / && rm -rf /code
