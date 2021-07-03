@@ -72,3 +72,13 @@ RUN mkdir /code && cd /code \
     && CUGRAPH_BUILD_PATH=/code/cugraph-21.06.00/build python setup.py build_ext --inplace --library-dir=/code/cugraph-21.06.00/build \
     && CUGRAPH_BUILD_PATH=/code/cugraph-21.06.00/build python setup.py install --user \
     && cd / && rm -rf /code
+
+# cuDF
+RUN mkdir /code && cd /code \
+    && git clone https://github.com/rapidsai/cudf.git && cd cudf \
+    && git submodule update --init --remote --recursive \
+    && cd cpp && mkdir build && cd build \
+    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && make -j && make install \
+    && cd /code/cudf/python/cudf && python setup.py build_ext --inplace \
+    && python setup.py install --user
