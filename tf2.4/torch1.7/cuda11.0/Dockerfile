@@ -57,28 +57,114 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
      rm -rf /var/lib/apt/lists/*
 
 
-# cugraph
-RUN mkdir /code && cd /code \
-    && wget https://github.com/rapidsai/cugraph/archive/refs/tags/v21.06.00.tar.gz -O- | tar xz \
-    && cd cugraph-21.06.00 && mkdir build && cd build \
-    && cmake ../cpp -DCMAKE_INSTALL_PREFIX=/usr/local \
-          -DCMAKE_CUDA_ARCHITECTURES="ALL" \
-          -DDISABLE_DEPRECATION_WARNING=ON \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DBUILD_STATIC_FAISS=OFF \
-          -DBUILD_CUGRAPH_MG_TESTS=ON \
-    && cmake --build . --target install -- -j10 \
-    && cd ../python \
-    && CUGRAPH_BUILD_PATH=/code/cugraph-21.06.00/build python setup.py build_ext --inplace --library-dir=/code/cugraph-21.06.00/build \
-    && CUGRAPH_BUILD_PATH=/code/cugraph-21.06.00/build python setup.py install --user \
-    && cd / && rm -rf /code
+# RUN apt-get update -y && apt-get -y install libssl-dev 
+# # install cmake 3.20.
+# RUN mkdir /code && cd /code \
+#     && wget https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5.tar.gz -O- | tar xz \
+#     && cd cmake-3.20.5 && cmake . && make -j && make install \
+#     && cd / && rm -rf /code 
 
-# cuDF
-RUN mkdir /code && cd /code \
-    && git clone https://github.com/rapidsai/cudf.git && cd cudf \
-    && git submodule update --init --remote --recursive \
-    && cd cpp && mkdir build && cd build \
-    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && make -j && make install \
-    && cd /code/cudf/python/cudf && python setup.py build_ext --inplace \
-    && python setup.py install --user
+# # From cuDF DockerFile
+# # https://github.com/rapidsai/cudf/blob/main/docker_build/Dockerfile
+# RUN apt install -y --no-install-recommends \
+#       build-essential \
+#       libboost-all-dev \
+#       libboost-filesystem-dev \
+#       libboost-system-dev \
+#       libboost-regex-dev \
+#       autoconf \
+#       bison \
+#       flex \
+#       libjemalloc-dev \
+#       protobuf-compiler && \
+#     apt-get autoremove -y && \
+#     apt-get clean && \
+#     rm -rf /var/lib/apt/lists/*
+
+# ENV CUDA_HOME=/usr/local/cuda
+# ENV CUDA_PATH=$CUDA_HOME
+# ENV PATH=${CUDA_HOME}/lib64/:${PATH}:${CUDA_HOME}/bin
+
+# # Build env variables for arrow
+# ENV CMAKE_BUILD_TYPE=release
+# ENV PYARROW_WITH_PARQUET=1
+# ENV PYARROW_WITH_CUDA=1
+# ENV PYARROW_WITH_ORC=1
+# ENV PYARROW_WITH_DATASET=1
+# ENV ARROW_HOME=/usr/local
+
+
+# # Build env variables for rmm
+# ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64:/usr/local/lib
+# RUN pip install --user cython
+# # # Install arrow from source
+# RUN git clone https://github.com/apache/arrow.git /repos/arrow \
+#     && cd /repos/arrow && git checkout apache-arrow-1.0.1 && git submodule init \
+#     && git submodule update && export PARQUET_TEST_DATA="${PWD}/cpp/submodules/parquet-testing/data" \
+#     && export ARROW_TEST_DATA="${PWD}/testing/data" \
+#     && cd /repos/arrow/cpp && mkdir release && cd /repos/arrow/cpp/release \
+#     && cmake .. -DCMAKE_INSTALL_PREFIX=${ARROW_HOME} -DCMAKE_INSTALL_LIBDIR=lib -DARROW_FLIGHT=ON \
+#         -DARROW_GANDIVA=OFF -DARROW_ORC=ON -DARROW_WITH_BZ2=ON -DARROW_WITH_ZLIB=ON \
+#         -DARROW_WITH_ZSTD=ON -DARROW_WITH_LZ4=ON -DARROW_WITH_SNAPPY=ON -DARROW_WITH_BROTLI=ON \
+#         -DARROW_PARQUET=ON -DARROW_PYTHON=ON -DARROW_PLASMA=ON \
+#         -DARROW_BUILD_TESTS=OFF -DARROW_CUDA=ON -DARROW_DATASET=ON \
+#         -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \
+#     && make -j && make install && cd /repos/arrow/python/ \
+#     && python setup.py build_ext --build-type=release bdist_wheel \
+#     && pip install --user /repos/arrow/python/dist/*.whl 
+
+
+# # # Install rmm from source
+# RUN pip install --user numba
+# RUN cd /repos/ && git clone https://github.com/rapidsai/rmm.git \
+#     && cd /repos/rmm/ && mkdir build && cd build \
+#     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+#               -DCUDA_STATIC_RUNTIME=ON \
+#               -DPER_THREAD_DEFAULT_STREAM=OFF \
+#               -DCMAKE_BUILD_TYPE=Release \
+#               -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \
+#     && make -j && make install && cd /repos/rmm/python \
+#     && pip install --user .
+    
+# # # Build env for CUDF build
+# ENV CUDF_HOME=/repos/cudf/
+# ENV CUDF_ROOT=/repos/cudf/cpp/build/
+
+# # # Install cudf from source
+# # cuFile is not install
+# # https://docs.nvidia.com/gpudirect-storage/troubleshooting-guide/index.html#unique_1907865909
+# # disable the AWS S3 filesystem
+
+# RUN cd /repos && git clone https://github.com/rapidsai/cudf.git \
+#     && cd /repos/cudf/ && git submodule update --init --recursive \
+#     && mkdir build && cd build \
+#     && cmake ../cpp -DCMAKE_INSTALL_PREFIX=/usr/local \
+#         -DUSE_NVTX=ON \
+#         -DBUILD_TESTS=OFF \
+#         -DBUILD_BENCHMARKS=OFF \
+#         -DDISABLE_DEPRECATION_WARNING=ON \
+#         -DPER_THREAD_DEFAULT_STREAM=OFF \
+#         -DCMAKE_BUILD_TYPE=Release \
+#         -DCUDF_ENABLE_ARROW_S3=OFF \
+#         -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \
+#     && make -j && make install && cd /repos/cudf/python/cudf \
+#     && /usr/bin/python -m pip install --user .
+
+# RUN apt-get -y install libmkl-full-dev
+
+# # cugraph
+# RUN mkdir /repos && cd /repos \
+#     && wget https://github.com/rapidsai/cugraph/archive/refs/tags/v21.06.00.tar.gz -O- | tar xz \
+#     && mv cugraph-21.06.00 cugraph \
+#     && mkdir build && cd build \
+#     && cmake ../cpp -DCMAKE_INSTALL_PREFIX=/usr/local \
+#           -DCMAKE_CUDA_ARCHITECTURES="ALL" \
+#           -DDISABLE_DEPRECATION_WARNING=ON \
+#           -DCMAKE_BUILD_TYPE=Release \
+#           -DBUILD_STATIC_FAISS=ON \
+#           -DBUILD_CUGRAPH_MG_TESTS=ON \
+#           -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \
+#     && cmake --build . --target install -- -j \
+#     && cd ../python \
+#     && CUGRAPH_BUILD_PATH=/repos/cugraph/build python setup.py build_ext --inplace --library-dir=/repos/cugraph/build \
+#     && CUGRAPH_BUILD_PATH=/repos/cugraph/build python setup.py install --user 
