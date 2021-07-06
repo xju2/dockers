@@ -9,9 +9,10 @@ COPY environments.yml /rapids/
 RUN conda env update --name rapids --file=/rapids/environments.yml
 # RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids && conda env update --file=/rapids/environments.yml
 
-RUN HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=1 \
-    HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \
-    pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
+# it is runtime container, no nvcc, no horovod!
+# RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids &&  HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=1 \
+#     HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \
+#     pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
 
 # NV-system for profiling
 # https://docs.nvidia.com/nsight-systems/InstallationGuide/index.html#cuda-support
