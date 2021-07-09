@@ -21,6 +21,14 @@ COPY environment.yml /code/
 RUN . /opt/conda/etc/profile.d/conda.sh \
     && conda env create --file=/code/environment.yml
 
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate devel \
+    && pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio===0.9.0 -f https://download.pytorch.org/whl/torch_stable.html \
+    && pip install --no-cache-dir torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+    && pip install --no-cache-dir torch-sparse==0.6.9  -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+    && pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+    && pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+    && pip install torch-geometric
+
 # # it is runtime container, no nvcc, no horovod!
 # RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids &&  HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=1 \
 #     HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \
