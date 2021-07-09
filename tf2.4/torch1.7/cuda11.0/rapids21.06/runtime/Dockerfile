@@ -40,8 +40,8 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
      rm -rf /var/lib/apt/lists/*
 
 
-    # pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-	# && pip install --no-cache-dir torch-sparse==0.6.9  -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-	# && pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-	# && pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-	# && pip install torch-geometric
+# pip install --no-cache-dir torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+# && pip install --no-cache-dir torch-sparse==0.6.9  -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+# && pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+# && pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+# && pip install torch-geometric

@@ -1,0 +1,21 @@
+name: devel
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+  - rapidsai
+dependencies:
+- cudnn
+- cudatoolkit=11.2
+- cugraph=21.06
+- python=3.7
+- faiss-gpu
+- pip
+- pip:
+  - tensorflow-gpu==2.5
+  - torch==1.9.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+  - torch-scatter -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html 
+  - torch-sparse -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html 
+  - torch-cluster -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html
+  - torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html
+  - torch-geometric
