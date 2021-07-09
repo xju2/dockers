@@ -1,4 +1,4 @@
-# this is for docexoty/exatrkx:tf2.5-torch1.9-cuda11.2-ubuntu20.04-rapids21.06-py3.9-runtime
+# this is for docexoty/exatrkx:tf2.5-torch1.9-cuda11.2-ubuntu20.04-rapids21.06-py3.7-runtime
 FROM nvidia/cuda:11.2.0-runtime-ubuntu20.04
 
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
