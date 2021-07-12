@@ -1,0 +1,23 @@
+channels:
+    - rapidsai-nightly
+    - nvidia
+    - pytorch
+    - conda-forge
+dependencies:
+- nccl
+- cudnn=8.*
+- pytorch==1.7.1
+- torchaudio
+- torchvision
+- mpi4py
+- pip
+- pip:
+    - line_profiler
+    - memory_profiler
+    - tensorboard==2.4
+    - tensorflow-gpu==2.4
+    - torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
+    - torch-sparse==0.6.9 -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
+    - torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html
+    - torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html
+    - torch-geometric
