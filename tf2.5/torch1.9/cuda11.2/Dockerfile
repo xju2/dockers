@@ -17,9 +17,12 @@ RUN wget --quiet \
     && rm -f Miniconda3-latest-Linux-x86_64.sh \
     && ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh 
 
-COPY environment.yml /code/
-RUN . /opt/conda/etc/profile.d/conda.sh \
-    && conda env create --file=/code/environment.yml
+# COPY environment.yml /code/
+# RUN . /opt/conda/etc/profile.d/conda.sh \
+#     && conda env create --file=/code/environment.yml
+
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate devel \
+    conda install -c nvidia -c rapidsai -c numba -c conda-forge cugraph cudatoolkit=11.0 
 
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate devel \
     && pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio===0.9.0 -f https://download.pytorch.org/whl/torch_stable.html \
