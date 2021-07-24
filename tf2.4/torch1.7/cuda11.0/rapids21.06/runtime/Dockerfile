@@ -40,6 +40,11 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
      rm -rf /var/lib/apt/lists/*
 
 
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+	&& conda install -c conda-forge cudnn \
+	&& pip install pytorch-lightning==1.0.2 graph_nets>=1.1 sklearn matplotlib \
+	&& pip install git+https://github.com/LAL/trackml-library.git
+
 # pip install --no-cache-dir torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
 # && pip install --no-cache-dir torch-sparse==0.6.9  -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
 # && pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \

@@ -1,27 +1,18 @@
 channels:
-    - conda-forge
-    - pytorch
-    - nvidia
-    - rapidsai-nightly
+  - conda-forge
+  - pytorch
+  - nvidia
+  - rapidsai
 dependencies:
-- gxx_linux-64=9.3.*
-- nvcc_linux-64=11.0
-- cmake
-- numba
 - cudnn=8.*
 - cudatoolkit=11.0
-- nccl
-- mpi4py
-- faiss-gpu=1.7.1
-- s3fs
-- pytorch=1.7.1
+- cugraph=21.06
+- cuml=21.06
 - pip
 - pip:
-    - line_profiler
-    - memory_profiler
-    - jupyter-tensorboard       
     - tensorboard==2.4
     - tensorflow-gpu==2.4
+    - torch==1.7.1+cu110 -f https://download.pytorch.org/whl/torch_stable.html
     - torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
     - torch-sparse==0.6.9 -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
     - torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html
