@@ -4,9 +4,7 @@ channels:
     - pytorch
     - conda-forge
 dependencies:
-- nccl
 - cudnn=8.*
-- pytorch==1.7.1
 - torchaudio
 - torchvision
 - mpi4py
