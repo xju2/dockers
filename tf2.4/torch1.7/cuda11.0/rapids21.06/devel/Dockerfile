@@ -3,13 +3,13 @@
 FROM rapidsai/rapidsai-dev:21.06-cuda11.0-devel-ubuntu20.04-py3.8
 
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && conda install -c conda-forge swig
+    && conda install -c conda-forge swig cudnn
 
 
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && pip install torch==1.7.1+cu110 -f https://download.pytorch.org/whl/torch_stable.html \
     && pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-    && pip install torch-sparse  -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
+    && pip install --no-cache-dir torch-sparse==0.6.9  -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
     && pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
     && pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
     && pip install torch-geometric \
@@ -24,7 +24,7 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
         -DPython_EXECUTABLE=`which python`\ 
         -DCMAKE_INSTALL_PREFIX=`/opt/conda/envs/rapids` \
     && make -j faiss  && make -j swigfiass \
-    && cd faiss/python && python setup.py install \
+    && cd faiss/python && pip install . \
     && cd /rapids/faiss/build && make install 
 
 # NV-system for profiling
