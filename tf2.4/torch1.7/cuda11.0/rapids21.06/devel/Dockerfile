@@ -13,7 +13,7 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
     && pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
     && pip install torch-geometric \
-    && pip install tensorflow=2.4 tensorboard==2.4
+    && pip install tensorflow==2.4 tensorboard==2.4
 
 
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
@@ -23,7 +23,7 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
         -DCMAKE_CUDA_ARCHITECTURES="60-real;70-real;75-real;80" \
         -DPython_EXECUTABLE=`which python`\ 
         -DCMAKE_INSTALL_PREFIX=`/opt/conda/envs/rapids` \
-    && make -j faiss  && make -j swigfiass \
+    && make -j faiss  && make -j swigfaiss \
     && cd faiss/python && pip install . \
     && cd /rapids/faiss/build && make install 
 
@@ -53,10 +53,42 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
          nsight-compute-2021.1 && \
      rm -rf /var/lib/apt/lists/*
 
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && cd /rapids && git clone https://github.com/xju2/prefix_sum.git \
+    && git clone https://github.com/murnanedaniel/FRNN.git && cd prefix_sum \
+    && NVCC_FLAGS="-gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_80,code=sm_80" python setup.py install \
+    && pip install . && cd /rapids/FRNN \
+    && NVCC_FLAGS="-gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_80,code=sm_80" python setup.py install \
+    && pip install . 
 
-# # it is runtime container, no nvcc, no horovod!
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && conda install -c conda-forge xtensor 
+
+
 # RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-#     && conda install -y gxx_linux-64=9.3.* openmpi-mpicxx mpi4py \
-#     &&  HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=1 \
+#     && pip install mxnet-cu110 \
+#     &&  HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=0\
 #     HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \
-#     pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
+#     pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.22.1
+
+RUN cd /rapids && git clone --recursive --branch v1.8.0 https://github.com/Microsoft/onnxruntime 
+
+# because onnx runtime looking for cudnn in cudnn_DIR/lib64
+RUN ln -s /opt/conda/envs/rapids/lib /opt/conda/envs/rapids/lib64
+
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && conda install -c conda-forge pybind11 mamba \
+    # && cd /rapids && git clone --recursive --branch v1.8.0 https://github.com/Microsoft/onnxruntime \
+    && cd /rapids/onnxruntime && git clean -fdx\
+    && ./build.sh --update \
+        --cuda_home /usr/local/cuda \
+        --cudnn_home /opt/conda/envs/rapids \
+        --use_cuda  --config Release \
+        --build_shared_lib --build_wheel --skip_tests --parallel 0 \
+        --mpi_home /usr/lib/x86_64-linux-gnu/openmpi \
+        --nccl_home /opt/conda/envs/rapids \
+        --cmake_extra_defines CMAKE_INSTALL_PREFIX=/opt/conda/envs/rapids \
+        CMAKE_CUDA_ARCHITECTURES="60-real;70-real;75-real;80" BUILD_ONNX_PYTHON=ON \
+        --enable_pybind  \
+    && cd build/Linux/Release && make install && pip install dist/* \
+    && cd /rapids && rm -rf onnxruntime
