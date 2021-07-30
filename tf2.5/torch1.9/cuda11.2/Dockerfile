@@ -1,4 +1,6 @@
 # this is for docexoty/exatrkx:tf2.5-torch1.9-cuda11.2-ubuntu20.04-rapids21.06-py3.8-devel
+# Finish and uploaded, horovod cannot be compiled
+# onnxruntime cannot be compiled because the google/protobuf used by rapidsai is newer than that used by onnxruntime.
 FROM rapidsai/rapidsai-dev:21.06-cuda11.2-devel-ubuntu20.04-py3.8
 # FROM nvidia/cuda:11.2.1-cudnn8-devel-ubuntu20.04
 
@@ -39,6 +41,13 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          nsight-compute-2021.1 && \
      rm -rf /var/lib/apt/lists/*
+
+# install other inputs for exatrkx
+Run . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && pip install pytorch-lightning \
+    git+https://github.com/LAL/trackml-library.git \
+    git+https://github.com/deepmind/graph_nets.git \
+    matplotlib sklearn pyyaml>=5.1 tqdm networkx 
 
 # RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
 #     && mamba install -y -c conda-forge mpi4py nvcc_linux-64=11.2 cxx-compiler 
