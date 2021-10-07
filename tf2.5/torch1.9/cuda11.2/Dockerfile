@@ -44,6 +44,6 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
 #     && mamba install -y -c conda-forge mpi4py nvcc_linux-64=11.2 cxx-compiler 
     
 
-# RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids &&  HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 \
-#     HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \
-#     pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids &&  HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 \
+    HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \
+    pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3

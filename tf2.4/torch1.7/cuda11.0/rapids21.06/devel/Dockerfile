@@ -71,7 +71,7 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
 #     HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \
 #     pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.22.1
 
-RUN cd /rapids && git clone --recursive --branch v1.8.0 https://github.com/Microsoft/onnxruntime 
+RUN cd /rapids && git clone --recursive --branch v1.8.1 https://github.com/Microsoft/onnxruntime 
 
 # because onnx runtime looking for cudnn in cudnn_DIR/lib64
 RUN ln -s /opt/conda/envs/rapids/lib /opt/conda/envs/rapids/lib64
