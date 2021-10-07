@@ -1,4 +1,6 @@
 # this is for docexoty/exatrkx:tf2.5-torch1.9-cuda11.2-ubuntu20.04-rapids21.06-py3.8-devel
+# Finish and uploaded, horovod cannot be compiled
+# onnxruntime cannot be compiled because the google/protobuf used by rapidsai is newer than that used by onnxruntime.
 FROM rapidsai/rapidsai-dev:21.06-cuda11.2-devel-ubuntu20.04-py3.8
 # FROM nvidia/cuda:11.2.1-cudnn8-devel-ubuntu20.04
 
@@ -39,6 +41,36 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          nsight-compute-2021.1 && \
      rm -rf /var/lib/apt/lists/*
+
+# install other inputs for exatrkx
+Run . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && pip install pytorch-lightning \
+    git+https://github.com/LAL/trackml-library.git \
+    git+https://github.com/deepmind/graph_nets.git \
+    matplotlib sklearn pyyaml>=5.1 tqdm networkx 
+
+
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && cd /rapids && git clone https://github.com/xju2/prefix_sum.git \
+    && git clone https://github.com/murnanedaniel/FRNN.git && cd prefix_sum \
+    && NVCC_FLAGS="-gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_80,code=sm_80" python setup.py install \
+    && pip install . && cd /rapids/FRNN \
+    && NVCC_FLAGS="-gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_80,code=sm_80" python setup.py install \
+    && pip install . 
+
+# # Add pre-compiled libtorch
+# RUN cd /rapids \
+#     && wget https://download.pytorch.org/libtorch/cu111/libtorch-shared-with-deps-1.9.0%2Bcu111.zip \
+#     && unzip libtorch-shared-with-deps-1.9.0+cu111.zip && rm libtorch-shared-with-deps-1.9.0+cu111.zip
+
+# add pre-compiled onnx-runtime
+RUN cd /rapids && mkdir onnxSrc && cd onnxSrc \
+    && wget -O onnx_archive.nupkg https://www.nuget.org/api/v2/package/Microsoft.ML.OnnxRuntime/1.8.0 \
+    && unzip onnx_archive.nupkg && rm onnx_archive.nupkg \
+    && mkdir -p /rapids/onnx/lib /rapids/onnx/include/onnxruntime \
+    && cp runtimes/linux-x64/native/libonnxruntime.so /rapids/onnx/lib \
+    && cp -r build/native/include /rapids/onnx/include/onnxruntime \
+    && chmod -R a+rX /rapids/onnx && cd /rapids && rm -rf onnxSrc
 
 # RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
 #     && mamba install -y -c conda-forge mpi4py nvcc_linux-64=11.2 cxx-compiler 
