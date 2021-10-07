@@ -47,3 +47,7 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids &&  HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 \
     HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \
     pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
+
+RUN cd /tmp/ && wget https://portal.nersc.gov/project/atlas/xju/onnx.tar.gz \
+    && tar xzf onnx.tar.gz && mkdir /usr/local/onnxruntime/ && mv include lib /usr/local/onnxruntime \
+    && rm -rf * 
