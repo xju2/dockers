@@ -1,3 +1,4 @@
+# docexoty/heptools:ubuntu20.04
 FROM nvidia/cuda:11.0.3-cudnn8-devel-ubuntu20.04
 
 # ROOT core dependences.
@@ -230,4 +231,46 @@ RUN mkdir /code && cd /code \
 	&& cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DEVTGEN_PHOTOS=ON -DEVTGEN_TAUOLA=ON -DEVTGEN_PYTHIA=ON \
 			-DCMAKE_C_COMPILER=`which cc` \
 			-DCMAKE_CXX_COMPILER=`which c++` \
-	&& make && make install  && cd / && rm -r /code 
+	&& make && make install  && cd / && rm -r /code
+
+
+# Delphes 3.5.0
+RUN cd /tmp \
+	&&    wget http://cp3.irmp.ucl.ac.be/downloads/Delphes-3.5.0.tar.gz -O- | tar xz \
+	&& cd Delphes-3.5.0 && mkdir build && cd build \
+	&& cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+			-DCMAKE_C_COMPILER=`which cc` \
+			-DCMAKE_CXX_COMPILER=`which c++` \
+	&& make && make install && rm -rf /tmp/*
+
+
+# Apache Arrow and Parquet
+# https://arrow.apache.org/install/
+# pip install --user pyarrow==5.0.* 
+RUN cd /tmp/ && pip install --user pyarrow==5.0.*  && apt-get update && apt-get install -y lsb-release \
+	&& wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+	&& apt-get install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+	&& apt-get update \
+	&& apt-get install -y -V libarrow-dev \
+	&& apt-get install -y -V libarrow-glib-dev \
+	&& apt-get install -y -V libarrow-dataset-dev \
+	&& apt-get install -y -V libarrow-flight-dev \
+	&& apt-get install -y -V libgandiva-dev \
+	&& apt-get install -y -V libgandiva-glib-dev \
+	&& apt-get install -y -V libparquet-dev \
+	&& apt-get install -y -V libparquet-glib-dev \
+	&& rm -rf /tmp/* \
+	&& apt-get clean all
+# Notes for Plasma related packages:
+#   * You need to enable "non-free" component on Debian GNU/Linux
+#   * You need to enable "multiverse" component on Ubuntu
+#   * You can use Plasma related packages only on amd64
+# sudo apt install -y -V libplasma-dev # For Plasma C++
+# sudo apt install -y -V libplasma-glib-dev # For Plasma GLib (C)
+
+
+# akward arrays and uproot
+RUN pip install --user uproot awkward
+
+# clang-format
+RUN apt-get install -y clang-format 

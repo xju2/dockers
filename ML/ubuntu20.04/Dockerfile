@@ -79,3 +79,19 @@ RUN cd /tmp && \
     cd build/Linux/RelWithDebInfo && \
     make install && \
     pip install --user dist/* && rm -rf /tmp/* 
+
+# Install clang-format
+RUN apt-get update -y && apt-get install -y clang-format
+
+
+# faiss-gpu
+RUN pip install --user faiss-gpu
+# RUN cd /tmp && git clone https://github.com/facebookresearch/faiss.git \
+#   && cd faiss && mkdir build && cd build \
+#   && cmake .. -DFAISS_ENABLE_GPU=ON -DFAISS_ENABLE_PYTHON=ON \
+#   -DCMAKE_CUDA_ARCHITECTURES="60-real;70-real;75-real;80" \
+#   -DPython_EXECUTABLE=`which python`\ 
+#   -DCMAKE_INSTALL_PREFIX=`/usr/local` \
+#   && make -j faiss  && make -j swigfaiss \
+#   && cd faiss/python && pip install --user . \
+#   && cd /rapids/faiss/build && make install 
