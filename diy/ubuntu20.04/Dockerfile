@@ -41,3 +41,37 @@ RUN mkdir /code && cd /code \
                     --prefix=/usr/local \
     && make -j10 && make install \
     && cd ../.. && rm -r /code
+
+# xtensor-0.21.5
+RUN mkdir /code && cd /code \
+	&& wget https://github.com/xtensor-stack/xtensor/archive/0.21.5.tar.gz -O- | tar xz \ 
+	&& cd xtensor-0.21.5 \
+	&& cmake . -DCMAKE_INSTALL_PREFIX=/usr/local \
+		-DCMAKE_CXX_COMPILER=`which c++` -DCMAKE_C_COMPILER=`which cc`  \
+	&& make install \
+    && cd ../.. && rm -r /code
+
+RUN apt-get update -y \
+    && apt-get -y install libboost-all-dev && rm -rf /var/lib/apt/lists/*
+
+# HighFive-master
+RUN mkdir /code && cd /code \
+	&& git clone https://github.com/BlueBrain/HighFive.git \
+	&& cd HighFive && mkdir build && cd build \
+	&& cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+		-DCMAKE_CXX_COMPILER=`which c++` -DCMAKE_C_COMPILER=`which cc` \
+		-DHIGHFIVE_EXAMPLES=OFF -DHIGHFIVE_UNIT_TESTS=OFF \
+		-DHIGHFIVE_USE_XTENSOR=ON -DHIGHFIVE_USE_EIGEN=ON \
+	&& make -j10 && make install \
+    && cd ../.. && rm -r /code
+
+# LHE H5
+RUN cd /tmp/ \
+    && wget https://portal.nersc.gov/project/atlas/xju/lheh5-0.3.2.tar.gz \
+    && tar xzf lheh5-0.3.2.tar.gz && cd lheh5-0.3.2 \
+    && mkdir build && cd build \
+    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DCMAKE_CXX_COMPILER=`which c++` -DCMAKE_C_COMPILER=`which cc` \
+        -DHIGHFIVE_DIR=/usr/local \
+    && make -j10 && make install \
+    && rm -rf /tmp/*
