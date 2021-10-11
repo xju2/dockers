@@ -1,9 +1,9 @@
 # docexoty/exatrkx:tf2.5-torch1.9-cuda11.2-ubuntu20.04-rapids21.10-py3.8-devel
 ARG RAPIDS_VERSION=21.10-cuda11.2-devel-ubuntu20.04-py3.8
+FROM rapidsai/rapidsai-dev:${RAPIDS_VERSION}
+
 ARG CMAKE_VERSION=3.21.1
 ARG TF_VERSION=2.5
-
-FROM rapidsai/rapidsai-dev:${RAPIDS_VERSION}
 
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && conda install -c conda-forge mamba 
