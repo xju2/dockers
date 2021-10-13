@@ -70,42 +70,26 @@ RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
 
 RUN cd /tmp && \
     git clone --recursive --branch v1.9.1 https://github.com/Microsoft/onnxruntime && \
-    cd onnxruntime
+    cd onnxruntime \
+    && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && for FILE in /opt/conda/envs/rapids/include/cudnn*; do ln -s $FILE /usr/include/$(basename $FILE); done \
+    && for FILE in /opt/conda/envs/rapids/lib/libcudnn*.so; do ln -s $FILE /usr/lib/x86_64-linux-gnu/$(basename $FILE); done \
+    && ./build.sh --skip_submodule_sync \
+        --cuda_home /opt/conda/envs/rapids \
+        --cudnn_home /usr/lib/x86_64-linux-gnu/ \
+        --use_cuda \
+        # --use_tensorrt \
+        # --tensorrt_home /usr/lib/x86_64-linux-gnu/ \
+        --config RelWithDebInfo \
+        --build_shared_lib \
+        --build_wheel \
+        --skip_tests \
+        --parallel 6 && \
+    cd build/Linux/RelWithDebInfo && \
+    make install && \
+    pip install dist/*  && rm -rf /tmp/* 
+# the above works
 
-
-# RUN cd /tmp && \
-#     git clone --recursive --branch v1.9.1 https://github.com/Microsoft/onnxruntime && \
-#     cd onnxruntime && \
-#     ./build.sh \
-#         --cuda_home /usr/local/cuda \
-#         --cudnn_home /usr/lib/x86_64-linux-gnu/ \
-#         --use_cuda \
-#         # --use_tensorrt \
-#         # --tensorrt_home /usr/lib/x86_64-linux-gnu/ \
-#         --config RelWithDebInfo \
-#         --build_shared_lib \
-#         --build_wheel \
-#         --skip_tests \
-#         --parallel ${NUM_JOBS} && \
-#     cd build/Linux/RelWithDebInfo && \
-#     make install && \
-#     pip install --user dist/* && rm -rf /tmp/* 
-
-
-# # Add pre-compiled libtorch
-# RUN cd /rapids \
-#     && wget https://download.pytorch.org/libtorch/cu111/libtorch-shared-with-deps-1.9.0%2Bcu111.zip \
-#     && unzip libtorch-shared-with-deps-1.9.0+cu111.zip && rm libtorch-shared-with-deps-1.9.0+cu111.zip
-
-# add pre-compiled onnx-runtime
-#RUN cd /rapids && mkdir onnxSrc && cd onnxSrc \
-#    && wget -O onnx_archive.nupkg https://www.nuget.org/api/v2/package/Microsoft.ML.OnnxRuntime/1.8.0 \
-#    && unzip onnx_archive.nupkg && rm onnx_archive.nupkg \
-#    && mkdir -p /rapids/onnx/lib /rapids/onnx/include/onnxruntime \
-#    && cp runtimes/linux-x64/native/libonnxruntime.so /rapids/onnx/lib \
-#    && cp -r build/native/include /rapids/onnx/include/onnxruntime \
-#    && chmod -R a+rX /rapids/onnx && cd /rapids && rm -rf onnxSrc
-#
 ## RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
 ##     && mamba install -y -c conda-forge mpi4py nvcc_linux-64=11.2 cxx-compiler 
 #    
@@ -113,7 +97,3 @@ RUN cd /tmp && \
 #RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids &&  HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 \
 #    HOROVOD_BUILD_CUDA_CC_LIST=70,75,80 HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_NCCL_LINK=SHARED \
 #    pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
-#
-#RUN cd /tmp/ && wget https://portal.nersc.gov/project/atlas/xju/onnx.tar.gz \
-#    && tar xzf onnx.tar.gz && mkdir /usr/local/onnxruntime/ && mv include lib /usr/local/onnxruntime \
-#    && rm -rf * 
