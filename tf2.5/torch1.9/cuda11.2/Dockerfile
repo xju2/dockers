@@ -72,23 +72,38 @@ RUN cd /tmp && \
     git clone --recursive --branch v1.9.1 https://github.com/Microsoft/onnxruntime && \
     cd onnxruntime \
     && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && for FILE in /opt/conda/envs/rapids/include/cudnn*; do ln -s $FILE /usr/include/$(basename $FILE); done \
-    && for FILE in /opt/conda/envs/rapids/lib/libcudnn*.so; do ln -s $FILE /usr/lib/x86_64-linux-gnu/$(basename $FILE); done \
+    && for FILE in /opt/conda/envs/rapids/include/cudnn*;\
+        do ln -s $FILE /usr/include/$(basename $FILE); done \
+    && for FILE in /opt/conda/envs/rapids/lib/libcudnn*.so;\
+        do ln -s $FILE /usr/lib/x86_64-linux-gnu/$(basename $FILE); done \
     && ./build.sh --skip_submodule_sync \
         --cuda_home /opt/conda/envs/rapids \
         --cudnn_home /usr/lib/x86_64-linux-gnu/ \
         --use_cuda \
-        # --use_tensorrt \
-        # --tensorrt_home /usr/lib/x86_64-linux-gnu/ \
         --config RelWithDebInfo \
-        --build_shared_lib \
         --build_wheel \
-        --skip_tests \
-        --parallel 6 && \
-    cd build/Linux/RelWithDebInfo && \
-    make install && \
-    pip install dist/*  && rm -rf /tmp/* 
+		--build_shared_lib \
+		--skip_tests \
+		--cmake_extra_defines 'CMAKE_CUDA_ARCHITECTURES=60;70;75;80' \
+        --parallel && \
+		cd build/Linux/RelWithDebInfo && \
+		make install && \
+		pip install dist/*  && rm -rf /tmp/* 
+        #--use_tensorrt \
+        #--tensorrt_home /usr/lib/x86_64-linux-gnu/ \
+    #     && \
 # the above works
+
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && cd /rapids && git clone https://github.com/facebookresearch/faiss.git \
+    && cd faiss && mkdir build && cd build \
+    && cmake .. -DFAISS_ENABLE_GPU=ON -DFAISS_ENABLE_PYTHON=ON \
+        -DCMAKE_CUDA_ARCHITECTURES="60-real;70-real;75-real;80" \
+        -DPython_EXECUTABLE=`which python`\ 
+        -DCMAKE_INSTALL_PREFIX=`/opt/conda/envs/rapids` \
+    && make -j faiss  && make -j swigfaiss \
+    && cd faiss/python && pip install . \
+    && cd /rapids/faiss/build && make install
 
 ## RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
 ##     && mamba install -y -c conda-forge mpi4py nvcc_linux-64=11.2 cxx-compiler 
