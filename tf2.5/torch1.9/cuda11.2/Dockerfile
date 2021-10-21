@@ -104,23 +104,3 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && make -j faiss  && make -j swigfaiss \
     && cd faiss/python && pip install . \
     && cd /rapids/faiss/build && make install
-
-
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && mamba install -y -c conda-forge -c omnia tbb-devel=2020.2 eigen3
-
-ENV INSTALL_PREFIX=/opt/conda/envs/rapids
-
-RUN ln -s /lib/x86_64-linux-gnu/libpthread.so.0 /lib64/ && \
-    ln -s /lib/x86_64-linux-gnu/libpthread.a  /usr/lib64/libpthread_nonshared.a && \
-    ln -s /lib/x86_64-linux-gnu/libc.a /usr/lib64/libc_nonshared.a && \
-    ln -s /lib/x86_64-linux-gnu/libc.so.6 /lib64/libc.so.6
-
-RUN mkdir /code && cd /code \
-    && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && wget https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.2.3.tar.gz -O- | tar xz \
-    && cd LHAPDF-6.2.3/ && ./configure --prefix=${INSTALL_PREFIX} \
-    && make -j && make install \
-    && cd ../.. && rm -r /code
-
-RUN 
