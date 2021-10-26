@@ -104,3 +104,6 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && make -j faiss  && make -j swigfaiss \
     && cd faiss/python && pip install . \
     && cd /rapids/faiss/build && make install
+
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && pip install wandb tables && mamba install -y onnx=1.9
