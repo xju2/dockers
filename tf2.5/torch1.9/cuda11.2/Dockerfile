@@ -107,3 +107,5 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
 
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && pip install wandb tables && mamba install -y onnx=1.9
+
+ENV export LD_PRELOAD=/opt/conda/envs/rapids/lib/libmkl_def.so:/opt/conda/envs/rapids/lib/libmkl_avx2.so:/opt/conda/envs/rapids/lib/libmkl_core.so:/opt/conda/envs/rapids/lib/libmkl_intel_lp64.so:/opt/conda/envs/rapids/lib/libmkl_intel_thread.so:/opt/conda/envs/rapids/lib/libiomp5.so
