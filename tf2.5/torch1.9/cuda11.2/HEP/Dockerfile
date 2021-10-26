@@ -78,7 +78,7 @@ ENV G4DATA=/opt/conda/envs/rapids/share/Geant4-10.6.2/data \
 
 RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && mamba install -y mesa-libgl-cos6-x86_64 libselinux-devel-cos6-x86_64 xorg-libxdamage libxxf86vm-devel-cos6-x86_64 \
-    && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/conda/envs/rapids/x86_64-conda_cos6-linux-gnu/sysroot/lib64 \
+    && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/conda/envs/rapids/x86_64-conda-linux-gnu/sysroot/usr/lib64 \
  	&& wget https://github.com/AIDASoft/DD4hep/archive/refs/tags/v01-16-01.tar.gz -O- | tar xz \
 	&& cd DD4hep-* && sed -i 's/EXACT//g' cmake/DD4hepBuild.cmake  && mkdir build && cd build \ 
     && cmake .. -DDD4HEP_USE_XERCESC=ON -DDXERCESC_ROOT_DIR=${INSTALL_PREFIX} \
@@ -93,24 +93,24 @@ RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && rm -rf /tmp/*
 
 
-# # libglu1-mesa-dev
-# # Fastjet 3.4.0
-# RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-#     && wget http://fastjet.fr/repo/fastjet-3.4.0.tar.gz -O- | tar xz \
-#     && cd fastjet-3.4.0 && ./configure --prefix=${INSTALL_PREFIX} \
-#     && make -j4 && make install \
-#     && rm -rf /tmp/*
+# Fastjet 3.4.0
+RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && wget http://fastjet.fr/repo/fastjet-3.4.0.tar.gz -O- | tar xz \
+    && cd fastjet-3.4.0 && ./configure --prefix=${INSTALL_PREFIX} \
+    && make -j4 && make install \
+    && rm -rf /tmp/*
 
 # # Pythia 8.302
 # RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
 #     && wget https://pythia.org/download/pythia83/pythia8302.tgz -O- | tar xz \
-#     && cd pythia*/ && ./configure --with-fastjet3=${INSTALL_PREFIX} \
-# 					--with-hepmc2=${INSTALL_PREFIX} --with-lhapdf6=${INSTALL_PREFIX} \
-# 					--with-root-bin=${INSTALL_PREFIX}/root/bin --with-root-lib=${INSTALL_PREFIX}/root/lib/root \
-# 					--with-root-include=${INSTALL_PREFIX}/root/include/root \
-# 					--with-gzip-include=/usr/include --with-gzip-lib=/usr/lib64 \
-# 					--with-hepmc3-include=${INSTALL_PREFIX}/include \
-#                     --with-hepmc3-lib=${INSTALL_PREFIX}/lib64 --cxx=c++ \
-#                     --prefix=${INSTALL_PREFIX} \
+#     && cd pythia*/ \
+#     && ./configure --with-fastjet3=${INSTALL_PREFIX} \
+#            --with-hepmc2=${INSTALL_PREFIX} --with-lhapdf6=${INSTALL_PREFIX} \
+#            --with-root-bin=${INSTALL_PREFIX}/root/bin --with-root-lib=${INSTALL_PREFIX}/root/lib/root \
+#            --with-root-include=${INSTALL_PREFIX}/root/include/root \
+#            --with-gzip-include=/usr/include --with-gzip-lib=/usr/lib64 \
+#            --with-hepmc3-include=${INSTALL_PREFIX}/include \
+#            --with-hepmc3-lib=${INSTALL_PREFIX}/lib64 --cxx=g++ \
+#            --prefix=${INSTALL_PREFIX} \
 #     && make -j4 && make install \
 #     && rm -rf /tmp/*
