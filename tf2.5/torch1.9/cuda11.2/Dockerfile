@@ -67,6 +67,8 @@ RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && bash cmake-${CMAKE_VERSION}-linux-x86_64.sh --prefix=/opt/conda/envs/rapids --exclude-subdir --skip-license \
 	&& rm -rf /tmp/*
 
+RUN rm /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so \
+    && ln -s /opt/conda/envs/rapids/lib/libstdc++.so.6.0.28 /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so
 
 RUN cd /tmp && \
     git clone --recursive --branch v1.9.1 https://github.com/Microsoft/onnxruntime && \
@@ -89,9 +91,6 @@ RUN cd /tmp && \
 		cd build/Linux/RelWithDebInfo && \
 		make install && \
 		pip install dist/*  && rm -rf /tmp/* 
-        #--use_tensorrt \
-        #--tensorrt_home /usr/lib/x86_64-linux-gnu/ \
-    #     && \
 # the above works
 
 RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \

@@ -100,6 +100,11 @@ RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && make -j4 && make install \
     && rm -rf /tmp/*
 
+
+RUN rm /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so \
+    && ln -s /opt/conda/envs/rapids/lib/libstdc++.so.6.0.28 /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so
+
+
 # # Pythia 8.302
 # RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
 #     && wget https://pythia.org/download/pythia83/pythia8302.tgz -O- | tar xz \
