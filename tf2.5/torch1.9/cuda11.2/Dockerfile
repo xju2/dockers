@@ -67,44 +67,50 @@ RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && bash cmake-${CMAKE_VERSION}-linux-x86_64.sh --prefix=/opt/conda/envs/rapids --exclude-subdir --skip-license \
 	&& rm -rf /tmp/*
 
-RUN rm /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so \
-    && ln -s /opt/conda/envs/rapids/lib/libstdc++.so.6.0.28 /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so
 
-RUN cd /tmp && \
-    git clone --recursive --branch v1.9.1 https://github.com/Microsoft/onnxruntime && \
-    cd onnxruntime \
+RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && pip install wandb tables \
+    && cd /rapids && git clone https://github.com/facebookresearch/faiss.git \
+    && cd faiss && mkdir build && cd build \
+    && cmake .. -DFAISS_ENABLE_GPU=ON -DFAISS_ENABLE_PYTHON=ON \
+        -DCMAKE_CUDA_ARCHITECTURES="60-real;70-real;75-real;80" \
+        -DPython_EXECUTABLE=${CONDA_PREFIX}/bin/python \
+        -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} \
+    && make -j faiss  && make -j swigfaiss \
+    && cd faiss/python && pip install . \
+    && cd /rapids/faiss/build && make install
+
+ENV export LD_PRELOAD=/opt/conda/envs/rapids/lib/libmkl_def.so:/opt/conda/envs/rapids/lib/libmkl_avx2.so:/opt/conda/envs/rapids/lib/libmkl_core.so:/opt/conda/envs/rapids/lib/libmkl_intel_lp64.so:/opt/conda/envs/rapids/lib/libmkl_intel_thread.so:/opt/conda/envs/rapids/lib/libiomp5.so
+
+# RUN rm /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so \
+#     && ln -s /opt/conda/envs/rapids/lib/libstdc++.so.6.0.28 /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so
+
+# the cudnn-home has to be /usr/lib/x86_64-linux-gnu/
+# if use /opt/conda/envs/rapids, onnxruntime will use an incompatible gtest that is used in rapidsai
+# copy all cudnn headers and libraries to /usr/lib/x86_64-linux-gnu/ seems solve the problem.
+RUN cd /rapids && \
+    git clone --recursive --branch v1.9.1 https://github.com/Microsoft/onnxruntime \
+    && cd onnxruntime \
     && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && for FILE in /opt/conda/envs/rapids/include/cudnn*;\
+    && for FILE in /opt/conda/envs/rapids/include/cudnn*; \
         do ln -s $FILE /usr/include/$(basename $FILE); done \
-    && for FILE in /opt/conda/envs/rapids/lib/libcudnn*.so;\
+    && for FILE in /opt/conda/envs/rapids/lib/libcudnn*.so; \
         do ln -s $FILE /usr/lib/x86_64-linux-gnu/$(basename $FILE); done \
     && ./build.sh --skip_submodule_sync \
         --cuda_home /opt/conda/envs/rapids \
         --cudnn_home /usr/lib/x86_64-linux-gnu/ \
         --use_cuda \
-        --config RelWithDebInfo \
+        --config Release \
         --build_wheel \
 		--build_shared_lib \
-		--skip_tests \
+		--skip_tests --skip_onnx_tests \
+        --path_to_protoc_exe /opt/conda/envs/rapids/bin/protoc \
 		--cmake_extra_defines 'CMAKE_CUDA_ARCHITECTURES=60;70;75;80' \
-        --parallel && \
-		cd build/Linux/RelWithDebInfo && \
-		make install && \
-		pip install dist/*  && rm -rf /tmp/* 
-# the above works
+            'CMAKE_INSTALL_PREFIX=/opt/conda/envs/rapids' \
+            'BUILD_ONNX_PYTHON=ON' \
+            'CMAKE_C_COMPILER=/usr/local/bin/gcc' \
+            'CMAKE_CXX_COMPILER=/usr/local/bin/g++' \
+        --parallel 3 --update --build && cd build/Linux/Release && \
+		make install && pip install dist/*
 
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && cd /rapids && git clone https://github.com/facebookresearch/faiss.git \
-    && cd faiss && mkdir build && cd build \
-    && cmake .. -DFAISS_ENABLE_GPU=ON -DFAISS_ENABLE_PYTHON=ON \
-        -DCMAKE_CUDA_ARCHITECTURES="60-real;70-real;75-real;80" \
-        -DPython_EXECUTABLE=`which python`\ 
-        -DCMAKE_INSTALL_PREFIX=`/opt/conda/envs/rapids` \
-    && make -j faiss  && make -j swigfaiss \
-    && cd faiss/python && pip install . \
-    && cd /rapids/faiss/build && make install
-
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && pip install wandb tables && mamba install -y onnx=1.9
-
-ENV export LD_PRELOAD=/opt/conda/envs/rapids/lib/libmkl_def.so:/opt/conda/envs/rapids/lib/libmkl_avx2.so:/opt/conda/envs/rapids/lib/libmkl_core.so:/opt/conda/envs/rapids/lib/libmkl_intel_lp64.so:/opt/conda/envs/rapids/lib/libmkl_intel_thread.so:/opt/conda/envs/rapids/lib/libiomp5.so
+RUN source activate rapids && mamba install onnx=1.10.0
