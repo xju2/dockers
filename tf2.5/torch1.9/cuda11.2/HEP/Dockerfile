@@ -130,3 +130,5 @@ RUN cd /tmp && source activate rapids \
            --prefix=${CONDA_PREFIX} \
     && make -j4 && make install \
     && rm -rf /tmp/*
+
+ENV LD_PRELOAD=/opt/conda/envs/rapids/lib/libmkl_def.so:/opt/conda/envs/rapids/lib/libmkl_avx2.so:/opt/conda/envs/rapids/lib/libmkl_core.so:/opt/conda/envs/rapids/lib/libmkl_intel_lp64.so:/opt/conda/envs/rapids/lib/libmkl_intel_thread.so:/opt/conda/envs/rapids/lib/libiomp5.so
