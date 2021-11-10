@@ -9,8 +9,10 @@ RUN apt-get update -y && source activate rapids && apt-get -y install \
 	libmysqlclient-dev libfftw3-dev \
 	graphviz-dev \
 	libldap2-dev libxml2-dev libkrb5-dev \
-	libgsl0-dev libboost-all-dev \
+	libgsl0-dev \
 	&& rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update -y && apt-get install libtbb2 libtbb-dev
 
 RUN cd /rapids && source activate rapids \
   	&& wget https://root.cern/download/root_v6.20.08.source.tar.gz -O- | tar xz \
@@ -24,11 +26,6 @@ RUN cd /tmp && source activate rapids \
     && wget https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.2.3.tar.gz -O- | tar xz \
     && cd LHAPDF-6.2.3/ && CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++ ./configure --prefix=${CONDA_PREFIX} \
     && make -j4 && make install && cd / && rm -r /tmp/*
-
-# RUN ln -s /lib/x86_64-linux-gnu/libpthread.so.0 /lib64/ && \
-#     ln -s /lib/x86_64-linux-gnu/libpthread.a  /usr/lib64/libpthread_nonshared.a && \
-#     ln -s /lib/x86_64-linux-gnu/libc.a /usr/lib64/libc_nonshared.a && \
-#     ln -s /lib/x86_64-linux-gnu/libc.so.6 /lib64/libc.so.6
 
 # HepMC2-2.06.11
 # HepMC3-3.2.1
@@ -88,8 +85,6 @@ ENV G4DATA=/opt/conda/envs/rapids/share/Geant4-10.6.2/data \
 # 01-16-01 requires python exactly 3.8.12, hack the cmake
 # https://github.com/AIDASoft/DD4hep/archive/refs/tags/v01-16-01.tar.gz
 
-RUN apt-get update -y && apt-get install libtbb2 libtbb-dev
-
 # TBB is completely messed up. 
 # rapidsai contains one, ROOT installed one, and I just install another one above
 # the code use find_packages(TBB required config), which did not find proper tbb config.
@@ -132,3 +127,9 @@ RUN cd /tmp && source activate rapids \
     && rm -rf /tmp/*
 
 ENV LD_PRELOAD=/opt/conda/envs/rapids/lib/libmkl_def.so:/opt/conda/envs/rapids/lib/libmkl_avx2.so:/opt/conda/envs/rapids/lib/libmkl_core.so:/opt/conda/envs/rapids/lib/libmkl_intel_lp64.so:/opt/conda/envs/rapids/lib/libmkl_intel_thread.so:/opt/conda/envs/rapids/lib/libiomp5.so
+
+# Dependencies for HPX
+RUN apt-get update -y && apt-get install -y hwloc libasio-dev libtcmalloc-minimal4 libgoogle-perftools-dev
+
+
+RUN apt-get -y install libeigen3-dev
