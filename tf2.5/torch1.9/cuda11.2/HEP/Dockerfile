@@ -132,4 +132,7 @@ ENV LD_PRELOAD=/opt/conda/envs/rapids/lib/libmkl_def.so:/opt/conda/envs/rapids/l
 RUN apt-get update -y && apt-get install -y hwloc libasio-dev libtcmalloc-minimal4 libgoogle-perftools-dev
 
 
-RUN apt-get -y install libeigen3-dev
+# for ACTS
+RUN apt-get -y install libeigen3-dev gdb
+# for pytorch
+RUN source activate rapids && mamba install -y mkl-include
