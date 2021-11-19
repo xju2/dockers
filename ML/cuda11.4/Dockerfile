@@ -1,4 +1,5 @@
-# docexoty/exatrkx:tf2.7-torch1.10-cuda11.4-rapids21.10
+# docexoty/exatrkx:tf2.7-torch1.10-cuda11.4-rapids21.10-devel
+# not ready yet! 2021/11/18
 ARG RAPIDS_VERSION=21.10-cuda11.4-devel-ubuntu20.04-py3.8
 FROM rapidsai/rapidsai-dev:${RAPIDS_VERSION}
 
