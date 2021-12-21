@@ -126,7 +126,7 @@ RUN cd /tmp && source activate rapids \
     && make -j4 && make install \
     && rm -rf /tmp/*
 
-ENV LD_PRELOAD=/opt/conda/envs/rapids/lib/libmkl_def.so:/opt/conda/envs/rapids/lib/libmkl_avx2.so:/opt/conda/envs/rapids/lib/libmkl_core.so:/opt/conda/envs/rapids/lib/libmkl_intel_lp64.so:/opt/conda/envs/rapids/lib/libmkl_intel_thread.so:/opt/conda/envs/rapids/lib/libiomp5.so
+# ENV LD_PRELOAD=/opt/conda/envs/rapids/lib/libmkl_def.so:/opt/conda/envs/rapids/lib/libmkl_avx2.so:/opt/conda/envs/rapids/lib/libmkl_core.so:/opt/conda/envs/rapids/lib/libmkl_intel_lp64.so:/opt/conda/envs/rapids/lib/libmkl_intel_thread.so:/opt/conda/envs/rapids/lib/libiomp5.so
 
 # Dependencies for HPX
 RUN apt-get update -y && apt-get install -y hwloc libasio-dev libtcmalloc-minimal4 libgoogle-perftools-dev
@@ -136,3 +136,18 @@ RUN apt-get update -y && apt-get install -y hwloc libasio-dev libtcmalloc-minima
 RUN apt-get -y install libeigen3-dev gdb
 # for pytorch
 RUN source activate rapids && mamba install -y mkl-include
+
+ENV PYTHIA8DATA=/opt/conda/envs/rapids/share/Pythia8/xmldoc/
+
+# install HPX
+RUN cd /rapids && source activate rapids \
+	&& git clone https://github.com/STEllAR-GROUP/hpx.git && cd hpx && git checkout 1.7.1 \
+	&& mkdir build && cd build \
+	&& cmake .. -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} \
+		-DCMAKE_C_COMPILER=/usr/local/bin/gcc \
+		-DCMAKE_CXX_COMPILER=/usr/local/bin/g++ \
+		-DHPX_WITH_CUDA=ON \
+		-DHPX_WITH_EXAMPLES_TBB=ON \
+  		-DTBB_LIBRARY=${CONDA_PREFIX}/lib/libtbbmalloc.so.2 \
+  		-DBOOST_ROOT=/opt/conda/envs/rapids \
+	&& make install -j4
