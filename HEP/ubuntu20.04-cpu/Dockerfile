@@ -1,8 +1,9 @@
-# docexoty/heptools:ubuntu20.04
-FROM nvidia/cuda:11.0.3-cudnn8-devel-ubuntu20.04
+# docexoty/heptools:ubuntu20.04-CPU
+FROM ubuntu:20.04
 
 # ROOT core dependences.
-RUN apt-get update -y && DEBIAN_FRONTEND="noninteractive" TZ="America/Los_Angeles" apt-get -y install \
+RUN apt-get update -y && DEBIAN_FRONTEND="noninteractive" TZ="America/Los_Angeles" \
+    apt-get -y install \
 	dpkg-dev cmake g++ gcc binutils libx11-dev libxpm-dev \
 	libxft-dev libxext-dev python libssl-dev 
 
@@ -33,61 +34,17 @@ ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64:/usr/lib64/mpich/li
 ENV PYTHONPATH=${PYTHONPATH}:/usr/local/lib/python3.8/site-packages
 ENV PYTHONPATH=${PYTHONPATH}:/usr/lib/python3.8/site-packages:/usr/local/root/lib/root
 
-# numpy needed for ROOT
+
 RUN pip3 install --user --upgrade pip \
-	&& pip install --user numpy==1.19.5  six==1.15.0 h5py==2.10.0 matplotlib seaborn
-
-# >>> python packages
-RUN pip install --user \
-		pylint jupyterlab jax jaxlib h5py iminuit \
-		vaex sklearn scipy numba mpi4py pyDOE2 autograd tables tqdm Gpy>=1.9.9 \
-		tensorflow==2.4 tensorboard==2.4 pynvml pycuda tensorrt 
-
-RUN pip install --user \
-	torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
-
-# pytorch-geometrics
-RUN  pip install --user torch-scatter==2.0.7 -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-	&& pip install --user --no-cache-dir torch-sparse==0.6.9  -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-	&& pip install --user torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-	&& pip install --user torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-	&& pip install --user torch-geometric
-
-RUN HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 \
-	HOROVOD_WITH_GLOO=1 HOROVOD_GPU_OPERATIONS=NCCL \
-	pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
-
-# NV-system for profiling
-RUN apt-get update -y && \
-     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-         apt-transport-https \
-         ca-certificates \
-         gnupg \
-         wget && \
-     rm -rf /var/lib/apt/lists/*
-RUN wget -qO - https://developer.download.nvidia.com/devtools/repos/ubuntu2004/amd64/nvidia.pub | apt-key add - && \
-     echo "deb https://developer.download.nvidia.com/devtools/repos/ubuntu2004/amd64/ /" >> /etc/apt/sources.list.d/nsight.list && \
-     apt-get update -y && \
-     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-         nsight-systems-2021.2 && \
-    rm -rf /var/lib/apt/lists/*
-
-# nsight-compute-2020.1.0
-# https://developer.nvidia.com/nsight-compute-history
-# https://developer.nvidia.com/blog/using-nsight-compute-in-containers/
-RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
-     wget -qO - https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub | apt-key add - && \
-         apt-get update -y && \
-     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-         nsight-compute-2021.1 && \
-     rm -rf /var/lib/apt/lists/*
-# python packages done<<< 
+	&& pip install --user matplotlib seaborn \
+	jupyterlab h5py numpy pandas sklearn scipy mpi4py pyDOE2 tables tqdm \
+    uproot awkward nose pytest && pip install --user -U "ray[tune]"
 
 # # >> ROOT
 RUN mkdir /code && cd /code \
-  	&& wget https://root.cern/download/root_v6.20.08.source.tar.gz -O- | tar xz \
+  	&& wget https://root.cern/download/root_v6.24.06.source.tar.gz -O- | tar xz \
   	&& mkdir root_builder && cd root_builder \
-	&& cmake -DCMAKE_INSTALL_PREFIX=/usr/local/root ../root-6.20.08 \
+	&& cmake -DCMAKE_INSTALL_PREFIX=/usr/local/root ../root-6.24.06 \
 		-Dminuit2=ON -Dgviz=ON -Drpath=ON -Dgnuinstall=OFF -DCMAKE_CXX_STANDARD=17 -Droot7=ON\
 		-DCMAKE_CXX_COMPILER=`which g++` -DCMAKE_C_COMPILER=`which gcc` \
 	&& cmake --build . --target install -- -j4 \
@@ -122,26 +79,36 @@ RUN mkdir /code && cd /code \
 	&& make -j10 && make install \
     && cd ../.. && rm -r /code
 
-# rivet-3.1.0
-RUN mkdir /code && cd /code \
-    && wget https://gitlab.com/hepcedar/rivetbootstrap/raw/3.1.0/rivet-bootstrap \
-    && chmod +x rivet-bootstrap \
-    && INSTALL_PREFIX=/usr/local INSTALL_GSL=0 INSTALL_RIVETDEV=0 MAKE="make -j4" ./rivet-bootstrap \
-    && echo "source /usr/local/share/Rivet/rivet-completion" > /etc/profile.d/rivet-completion.sh \
-    && echo "source /usr/local/share/YODA/yoda-completion" > /etc/profile.d/yoda-completion.sh \
-    && rm -rf /code
+# # rivet-3.1.0
+# RUN mkdir /code && cd /code \
+#     && wget https://gitlab.com/hepcedar/rivetbootstrap/raw/3.1.0/rivet-bootstrap \
+#     && chmod +x rivet-bootstrap \
+#     && INSTALL_PREFIX=/usr/local INSTALL_GSL=0 INSTALL_RIVETDEV=0 MAKE="make -j4" ./rivet-bootstrap \
+#     && echo "source /usr/local/share/Rivet/rivet-completion" > /etc/profile.d/rivet-completion.sh \
+#     && echo "source /usr/local/share/YODA/yoda-completion" > /etc/profile.d/yoda-completion.sh \
+#     && rm -rf /code
 
+
+# HepMC2-2.06.11
 # HepMC3-3.2.1
-RUN mkdir /code && cd /code \
-	&& wget http://hepmc.web.cern.ch/hepmc/releases/HepMC3-3.2.1.tar.gz -O- | tar xz \
-	&& cd HepMC3-* && mkdir build && cd build \	
+RUN cd /tmp \
+    && wget http://hepmc.web.cern.ch/hepmc/releases/hepmc2.06.11.tgz -O- | tar xz \
+    && cd HepMC-2.06.11 && mkdir build && cd build \
+    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+		-DCMAKE_C_COMPILER=`which gcc` \
+		-DCMAKE_CXX_COMPILER=`which g++` \
+        -Dmomentum="GEV" -Dlength="MM" -Dbuild_docs=OFF\
+	&& make -j && make install \
+    && cd /tmp && wget http://hepmc.web.cern.ch/hepmc/releases/HepMC3-3.2.1.tar.gz -O- | tar xz \
+    && cd /tmp/HepMC3-* && mkdir build && cd build  \
 	&& cmake .. -DHEPMC3_ENABLE_ROOTIO=OFF \
 		-DHEPMC3_ENABLE_PYTHON=OFF \	
 		-DCMAKE_INSTALL_PREFIX=/usr/local \
 		-DHEPMC3_BUILD_EXAMPLES=OFF \
 		-DCMAKE_CXX_COMPILER=`which g++` -DCMAKE_C_COMPILER=`which gcc` \
-	&& make -j10 && make install \
-    && cd ../../ && rm -r /code
+	&& make -j && make install \
+    && rm -rf /tmp/*
+
 
 ENV PYTHIA8DATA=/usr/local/share/Pythia8/xmldoc/
 
@@ -236,39 +203,3 @@ RUN cd /tmp \
 	&& cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
 			-DCMAKE_CXX_COMPILER=`which g++` -DCMAKE_C_COMPILER=`which gcc` \
 	&& make && make install && rm -rf /tmp/*
-
-
-# Apache Arrow and Parquet
-# https://arrow.apache.org/install/
-# pip install --user pyarrow==5.0.* 
-RUN cd /tmp/ && pip install --user pyarrow==5.0.*  && apt-get update && apt-get install -y lsb-release \
-	&& wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
-	&& apt-get install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
-	&& apt-get update \
-	&& apt-get install -y -V libarrow-dev \
-	&& apt-get install -y -V libarrow-glib-dev \
-	&& apt-get install -y -V libarrow-dataset-dev \
-	&& apt-get install -y -V libarrow-flight-dev \
-	&& apt-get install -y -V libgandiva-dev \
-	&& apt-get install -y -V libgandiva-glib-dev \
-	&& apt-get install -y -V libparquet-dev \
-	&& apt-get install -y -V libparquet-glib-dev \
-	&& rm -rf /tmp/* \
-	&& apt-get clean all
-
-# Notes for Plasma related packages:
-#   * You need to enable "non-free" component on Debian GNU/Linux
-#   * You need to enable "multiverse" component on Ubuntu
-#   * You can use Plasma related packages only on amd64
-# sudo apt install -y -V libplasma-dev # For Plasma C++
-# sudo apt install -y -V libplasma-glib-dev # For Plasma GLib (C)
-
-
-# akward arrays and uproot
-# and nose pytest for Gaudi
-# ray for fun
-RUN pip install --user uproot awkward && pip install --user -U "ray[tune]" nose pytest
-# # clang-format
-# RUN apt-get update -y && apt-get install -y \
-# 	clang-format librange-v3-dev libfmt-dev libjemalloc-dev libcppunit-dev \
-# 	libgtest-dev nlohmann-json3-dev libgoogle-perftools-dev
