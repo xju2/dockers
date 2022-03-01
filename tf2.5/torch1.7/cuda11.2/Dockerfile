@@ -22,11 +22,11 @@ RUN pip install --user tensorflow==2.5
 RUN pip install --user torch==1.7.1+cu110 -f https://download.pytorch.org/whl/torch_stable.html 
 
 # pytorch-geometrics
-RUN  pip install --user torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
+RUN  pip install --user torch-scatter==2.0.7 -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
 RUN  pip install --user --no-cache-dir torch-sparse==0.6.9  -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html 
 RUN  pip install --user torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
 	&& pip install --user torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
-	&& pip install --user torch-geometric
+	&& pip install --user torch-geometric==1.7.1
 
 RUN HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=1 HOROVOD_GPU_OPERATIONS=NCCL pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
 
@@ -55,3 +55,5 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          nsight-compute-2021.1 && \
      rm -rf /var/lib/apt/lists/*
+
+RUN pip install --user xgboost && pip install -U "ray[tune]"
