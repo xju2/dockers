@@ -150,4 +150,22 @@ RUN cd /rapids && source activate rapids \
 		-DHPX_WITH_EXAMPLES_TBB=ON \
   		-DTBB_LIBRARY=${CONDA_PREFIX}/lib/libtbbmalloc.so.2 \
   		-DBOOST_ROOT=/opt/conda/envs/rapids \
-	&& make install -j4
+	&& make install -j4 && rm -rf *
+
+
+RUN cd /rapids && source activate rapids \
+	&&    wget http://cp3.irmp.ucl.ac.be/downloads/Delphes-3.5.0.tar.gz -O- | tar xz \
+	&& cd Delphes-3.5.0 && mkdir build && cd build \
+	&& cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+			-DCMAKE_CXX_COMPILER=/usr/local/bin/g++ \
+			-DCMAKE_C_COMPILER=/usr/local/bin/gcc \
+	&& make && make install && rm -rf /rapids/Delphes-3.5.0
+
+# install py8 executable
+RUN cd /rapids && source activate rapids \
+	&& git clone https://github.com/xju2/MCGenerators.git && cd MCGenerators/pythia8 \
+	&& mkdir build && cd build \
+	&& cmake .. -DCMAKE_C_COMPILER=/usr/local/bin/gcc \
+    	-DCMAKE_CXX_COMPILER=/usr/local/bin/g++ \
+    	-DPYTHIA8_DIR=$CONDA_PREFIX -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
+	&& make -j4 && make install && rm -rf *
