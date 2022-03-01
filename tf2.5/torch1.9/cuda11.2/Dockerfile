@@ -5,20 +5,23 @@ FROM rapidsai/rapidsai-dev:${RAPIDS_VERSION}
 ARG CMAKE_VERSION=3.21.1
 ARG TF_VERSION=2.5
 
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && conda install -c conda-forge mamba 
+RUN source activate rapids && conda install -c conda-forge mamba \
+    && mamba install -y swig cudnn=8.2.1 xtensor pybind11 
 
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && mamba install -y swig cudnn xtensor pybind11 
+# Install cmake
+RUN cd /tmp && source activate rapids \
+    && wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-x86_64.sh \
+    && bash cmake-${CMAKE_VERSION}-linux-x86_64.sh --prefix=/opt/conda/envs/rapids --exclude-subdir --skip-license \
+	&& rm -rf /tmp/*
 
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+RUN source activate rapids \
     && pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio===0.9.0 -f https://download.pytorch.org/whl/torch_stable.html \
     && pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html \
     && pip install torch-sparse  -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html \
     && pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html \
     && pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html \
     && pip install torch-geometric \
-    && pip install tensorflow_gpu==${TF_VERSION}
+    && pip install tensorflow_gpu==${TF_VERSION} tensorboard==2.6.0
 
 # NV-system for profiling
 # https://docs.nvidia.com/nsight-systems/InstallationGuide/index.html#cuda-support
@@ -47,13 +50,13 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
      rm -rf /var/lib/apt/lists/*
 
 # install other inputs for exatrkx
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+RUN source activate rapids \
     && pip install pytorch-lightning \
     git+https://github.com/LAL/trackml-library.git \
     git+https://github.com/deepmind/graph_nets.git \
     matplotlib sklearn pyyaml>=5.1 tqdm networkx 
 
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+RUN source activate rapids \
     && cd /rapids && git clone https://github.com/xju2/prefix_sum.git \
     && git clone https://github.com/murnanedaniel/FRNN.git && cd prefix_sum \
     && NVCC_FLAGS="-gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_80,code=sm_80" python setup.py install \
@@ -61,14 +64,8 @@ RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
     && NVCC_FLAGS="-gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_80,code=sm_80" python setup.py install \
     && pip install . 
 
-# Install cmake
-RUN cd /tmp && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
-    && wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-x86_64.sh \
-    && bash cmake-${CMAKE_VERSION}-linux-x86_64.sh --prefix=/opt/conda/envs/rapids --exclude-subdir --skip-license \
-	&& rm -rf /tmp/*
 
-
-RUN . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+RUN source activate rapids \
     && pip install wandb tables \
     && cd /rapids && git clone https://github.com/facebookresearch/faiss.git \
     && cd faiss && mkdir build && cd build \
@@ -91,7 +88,7 @@ ENV export LD_PRELOAD=/opt/conda/envs/rapids/lib/libmkl_def.so:/opt/conda/envs/r
 RUN cd /rapids && \
     git clone --recursive --branch v1.9.1 https://github.com/Microsoft/onnxruntime \
     && cd onnxruntime \
-    && . /opt/conda/etc/profile.d/conda.sh && conda activate rapids \
+    && source activate rapids \
     && for FILE in /opt/conda/envs/rapids/include/cudnn*; \
         do ln -s $FILE /usr/include/$(basename $FILE); done \
     && for FILE in /opt/conda/envs/rapids/lib/libcudnn*.so; \
