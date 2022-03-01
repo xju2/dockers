@@ -168,8 +168,14 @@ RUN mkdir /code && cd /code \
 		--with-tauola=/usr/local --prefix=/usr/local \
 	&& make -j10 && make install && cd ../.. && rm -r /code
 
-# Pythia 8.302
+# fastjet3
 RUN mkdir /code && cd /code \
+	&& wget http://fastjet.fr/repo/fastjet-3.4.0.tar.gz -O- | tar xz \
+	&& cd fastjet-3.4.0 && ./configure --prefix=/usr/local \
+		--enable-allplugins && make && make install
+
+# Pythia 8.302
+RUN cd /code \
     && wget https://pythia.org/download/pythia83/pythia8302.tgz -O- | tar xz \
     && cd pythia*/ && ./configure --with-fastjet3=/usr/local \
 					--with-hepmc2=/usr/local --with-lhapdf6=/usr/local \
@@ -177,29 +183,33 @@ RUN mkdir /code && cd /code \
 					--with-root-include=/usr/local/root/include/root \
 					--with-python=/usr/include/python3.8 --with-gzip-include=/usr/include --with-gzip-lib=/usr/lib64 \
 					--with-hepmc3-include=/usr/local/include --with-hepmc3-lib=/usr/local/lib64 --cxx=g++ --prefix=/usr/local \
-    && make -j10 && make install \
-    && cd ../.. && rm -r /code
+    && make -j10 && make install
 
 # Tauola-1.1.8
-RUN mkdir /code && cd /code \
+RUN cd /code \
 	&& wget http://tauolapp.web.cern.ch/tauolapp/resources/TAUOLA.1.1.8/TAUOLA.1.1.8-LHC.tar.gz -O- | tar xz \
 	&& cd TAUOLA && CXX=g++ ./configure --with-hepmc=/usr/local --with-hepmc3=/usr/local \
 			--with-lhapdf=/usr/local --with-pythia8=/usr/local --prefix=/usr/local \
-	&& make -j10 && make install && cd ../.. && rm -r /code 
+	&& make -j10 && make install
 
 # # EvtGen 2.0?
-RUN mkdir /code && cd /code \
+RUN cd /code \
 	&& wget https://evtgen.hepforge.org/downloads?f=EvtGen-02.00.00.tar.gz -O- | tar xz \
 	&& cd EvtGen/R02-00-00 && mkdir build && cd build \
 	&& cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DEVTGEN_PHOTOS=ON -DEVTGEN_TAUOLA=ON -DEVTGEN_PYTHIA=ON \
 			-DCMAKE_CXX_COMPILER=`which g++` -DCMAKE_C_COMPILER=`which gcc` \
-	&& make && make install  && cd / && rm -r /code
+	&& make && make install
 
 
 # Delphes 3.5.0
-RUN cd /tmp \
+RUN cd /code \
 	&&    wget http://cp3.irmp.ucl.ac.be/downloads/Delphes-3.5.0.tar.gz -O- | tar xz \
 	&& cd Delphes-3.5.0 && mkdir build && cd build \
 	&& cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
 			-DCMAKE_CXX_COMPILER=`which g++` -DCMAKE_C_COMPILER=`which gcc` \
-	&& make && make install && rm -rf /tmp/*
+	&& make && make install
+
+# Ray Taskfarmer
+RUN cd /code \
+	&& git clone https://gitlab.cern.ch/berkeleylab/raytaskfarmer.git \
+	&& cd raytaskfarmer && pip install .
