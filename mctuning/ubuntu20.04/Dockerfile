@@ -38,3 +38,5 @@ RUN pip install --user \
         numpy==1.19 six==1.15.0 h5py==2.10 matplotlib seaborn \
         pylint jax jaxlib iminuit cython\
         sklearn scipy numba mpi4py pyDOE2 autograd tables tqdm Gpy>=1.9.9
+
+RUN apt update && apt install -y texlive-full
