@@ -213,3 +213,11 @@ RUN cd /code \
 RUN cd /code \
 	&& git clone https://gitlab.cern.ch/berkeleylab/raytaskfarmer.git \
 	&& cd raytaskfarmer && pip install .
+
+ENV G4DATA=/usr/local/share/Geant4-10.6.2/data
+ENV G4ENSDFSTATEDATA=${G4DATA}/G4ENSDFSTATE2.2 \
+    G4LEVELGAMMADATA=${G4DATA}/PhotonEvaporation5.5 \
+    G4PARTICLEXSDATA=${G4DATA}/G4PARTICLEXS2.1 \
+    G4RADIOACTIVEDATA=${G4DATA}/RadioactiveDecay5.4 \
+    G4LEDATA=${G4DATA}/G4EMLOW7.9.1 \
+    G4NEUTRONHPDATA=${G4DATA}/G4NDL4.6
