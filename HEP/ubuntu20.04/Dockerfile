@@ -272,3 +272,11 @@ RUN pip install --user uproot awkward && pip install --user -U "ray[tune]" nose 
 # RUN apt-get update -y && apt-get install -y \
 # 	clang-format librange-v3-dev libfmt-dev libjemalloc-dev libcppunit-dev \
 # 	libgtest-dev nlohmann-json3-dev libgoogle-perftools-dev
+
+ENV G4DATA=/usr/local/share/Geant4-10.6.2/data
+ENV G4ENSDFSTATEDATA=${G4DATA}/G4ENSDFSTATE2.2 \
+    G4LEVELGAMMADATA=${G4DATA}/PhotonEvaporation5.5 \
+    G4PARTICLEXSDATA=${G4DATA}/G4PARTICLEXS2.1 \
+    G4RADIOACTIVEDATA=${G4DATA}/RadioactiveDecay5.4 \
+    G4LEDATA=${G4DATA}/G4EMLOW7.9.1 \
+    G4NEUTRONHPDATA=${G4DATA}/G4NDL4.6
