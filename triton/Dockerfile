@@ -1,97 +1,62 @@
-# docexoty/mltools:ubuntu20.04
-FROM nvidia/cuda:11.2.2-cudnn8-devel-ubuntu20.04
+# docexoty/exasvc:ubuntu20.04
+FROM nvidia/cuda:11.3.1-cudnn8-devel-ubuntu20.04
 
-RUN apt-get update -y  && DEBIAN_FRONTEND="noninteractive" TZ="America/Los_Angeles"  apt-get -y install \
-	python3-dev python3-pip git vim libhdf5-mpich-dev cmake nodejs
+# ROOT core dependences.
+RUN apt-get update -y && DEBIAN_FRONTEND="noninteractive" TZ="America/Los_Angeles" apt-get -y install \
+	dpkg-dev cmake g++ gcc binutils libx11-dev libxpm-dev \
+	libxft-dev libxext-dev python libssl-dev 
+
+# # ROOT optional packages
+RUN apt-get --fix-missing -y install \
+	gfortran libpcre3-dev \
+	xlibmesa-glu-dev libglew-dev libftgl-dev \
+	libmysqlclient-dev libfftw3-dev libcfitsio-dev \
+	graphviz-dev \
+	libldap2-dev python-dev libxml2-dev libkrb5-dev \
+	libgsl0-dev wget \
+	libtbb2 libtbb-dev libboost-all-dev vim \
+    python3-dev python3-pip python3-sphinx python3-numpy-dev \
+	git libeigen3-dev xtl-dev libhdf5-mpich-dev \
+	libxerces-c-dev libxerces-c3.2 rsync autoconf automake nodejs doxygen \
+	valgrind  && \
+    rm -rf /var/lib/apt/lists/*
+
 
 # point python to python3.
-RUN ln -s /usr/bin/python3.8 /usr/bin/python && pip install --user --upgrade pip 
+RUN rm /usr/bin/python && ln -s /usr/bin/python3.8 /usr/bin/python
 
 ENV PYTHONUSERBASE="/usr/local/python3.8"
 ENV PATH=/usr/local/root/bin:/usr/local/python3.8/bin:$PATH
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64:/usr/lib64/mpich/lib:/usr/local/lib
+ENV PYTHONPATH=${PYTHONPATH}:/usr/local/lib/python3.8/site-packages
 ENV PYTHONPATH=${PYTHONPATH}:/usr/lib/python3.8/site-packages:/usr/local/root/lib/root
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
 
-RUN pip install --user torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio===0.9.0 -f https://download.pytorch.org/whl/torch_stable.html \
-    && pip install --user torch-scatter -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html \
-    && pip install --user torch-sparse  -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html \
-    && pip install --user torch-cluster -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html \
-    && pip install --user torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.9.0+cu111.html \
-    && pip install --user torch-geometric \
-    && pip install --user tensorflow_gpu==2.5 \
-	&& pip install --user pytorch-lightning \
-    		git+https://github.com/LAL/trackml-library.git \
-    		git+https://github.com/deepmind/graph_nets.git \
-    		matplotlib sklearn pyyaml>=5.1 tqdm networkx pytest onnx \
-	&& pip install --user -U tf2onnx
 
-RUN HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=1 HOROVOD_GPU_OPERATIONS=NCCL pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
+ARG PYTORCH_VERSION=1.11.0
+ARG CUDA_VERSION=cu113
+RUN pip install --user torch==${PYTORCH_VERSION}+${CUDA_VERSION} \
+    torchvision==0.12.0+${CUDA_VERSION} \
+    torchaudio===0.11.0 -f https://download.pytorch.org/whl/cu113/torch_stable.html 
 
-# NV-system for profiling
-# https://docs.nvidia.com/nsight-systems/InstallationGuide/index.html#cuda-support
-RUN apt-get update -y && \
-     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-         apt-transport-https \
-         ca-certificates \
-         gnupg \
-         wget && \
-     rm -rf /var/lib/apt/lists/*
-RUN wget -qO - https://developer.download.nvidia.com/devtools/repos/ubuntu2004/amd64/nvidia.pub | apt-key add - && \
-     echo "deb https://developer.download.nvidia.com/devtools/repos/ubuntu2004/amd64/ /" >> /etc/apt/sources.list.d/nsight.list && \
-     apt-get update -y && \
-     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-         nsight-systems-2021.2  && \
-    rm -rf /var/lib/apt/lists/*
-
-# nsight-compute-2020.1.0
-# https://developer.nvidia.com/nsight-compute-history
-# https://developer.nvidia.com/blog/using-nsight-compute-in-containers/
-RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
-     wget -qO - https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub | apt-key add - && \
-         apt-get update -y && \
-     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-         nsight-compute-2021.1 && \
-     rm -rf /var/lib/apt/lists/*
-
-# Install cmake
-ARG CMAKE_VERSION=3.21.1
+# # >> ROOT
 RUN cd /tmp && \
-    wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-x86_64.sh && \
-    bash cmake-${CMAKE_VERSION}-linux-x86_64.sh --prefix=/usr/local --exclude-subdir --skip-license \
-	&& rm -rf /tmp/*
+    wget https://root.cern/download/root_v6.26.00.source.tar.gz -O- | tar xz \
+  	&& mkdir root_builder && cd root_builder \
+	&& cmake -DCMAKE_INSTALL_PREFIX=/usr/local/root ../root-6.26.00 \
+		-Dminuit2=ON -Dgviz=ON -Drpath=ON -Dgnuinstall=OFF -DCMAKE_CXX_STANDARD=17 -Droot7=ON\
+		-DCMAKE_CXX_COMPILER=`which g++` -DCMAKE_C_COMPILER=`which gcc` \
+	&& cmake --build . --target install -- -j4 \
+	&& cd  && rm -rf /code && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
 
-# Install ONNX Runtime
-# https://github.com/leimao/ONNX-Runtime-Inference/blob/main/docker/onnxruntime-cuda.Dockerfile#L115
-RUN cd /tmp && \
-    git clone --recursive --branch v1.8.2 https://github.com/Microsoft/onnxruntime && \
-    cd onnxruntime && \
-    ./build.sh \
-        --cuda_home /usr/local/cuda \
-        --cudnn_home /usr/lib/x86_64-linux-gnu/ \
-        --use_cuda \
-        # --use_tensorrt \
-        # --tensorrt_home /usr/lib/x86_64-linux-gnu/ \
-        --config RelWithDebInfo \
-        --build_shared_lib \
-        --build_wheel \
-        --skip_tests \
-        --parallel ${NUM_JOBS} && \
-    cd build/Linux/RelWithDebInfo && \
-    make install && \
-    pip install --user dist/* && rm -rf /tmp/* 
-
-# Install clang-format
-RUN apt-get update -y && apt-get install -y clang-format
-
-
-# faiss-gpu
-RUN pip install --user faiss-gpu
-# RUN cd /tmp && git clone https://github.com/facebookresearch/faiss.git \
-#   && cd faiss && mkdir build && cd build \
-#   && cmake .. -DFAISS_ENABLE_GPU=ON -DFAISS_ENABLE_PYTHON=ON \
-#   -DCMAKE_CUDA_ARCHITECTURES="60-real;70-real;75-real;80" \
-#   -DPython_EXECUTABLE=`which python`\ 
-#   -DCMAKE_INSTALL_PREFIX=`/usr/local` \
-#   && make -j faiss  && make -j swigfaiss \
-#   && cd faiss/python && pip install --user . \
-#   && cd /rapids/faiss/build && make install 
+    # && pip install --user torch-scatter -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDA_VERSION}.html \
+    # && pip install --user torch-sparse  -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDA_VERSION}.html \
+    # && pip install --user torch-cluster -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDA_VERSION}.html \
+    # && pip install --user torch-spline-conv -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDA_VERSION}.html \
+    # && pip install --user torch-geometric \
+    # && pip install --user tensorflow_gpu==2.5 \
+	# && pip install --user pytorch-lightning \
+    # 		git+https://github.com/LAL/trackml-library.git \
+    # 		git+https://github.com/deepmind/graph_nets.git \
+    # 		matplotlib sklearn pyyaml>=5.1 tqdm networkx pytest onnx \
+	# && pip install --user -U tf2onnx \
+    # && pip install --user faiss-gpu
