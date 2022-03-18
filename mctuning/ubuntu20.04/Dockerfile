@@ -40,3 +40,5 @@ RUN pip install --user \
         sklearn scipy numba mpi4py pyDOE2 autograd tables tqdm Gpy>=1.9.9
 
 RUN apt update && apt install -y texlive-full
+
+RUN pip install --user -U "ray[tune]"
