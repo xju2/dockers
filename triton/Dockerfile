@@ -33,9 +33,9 @@ ENV PYTHONPATH=${PYTHONPATH}:/usr/lib/python3.8/site-packages:/usr/local/root/li
 
 
 ARG PYTORCH_VERSION=1.11.0
-ARG CUDA_VERSION=cu113
-RUN pip install --user torch==${PYTORCH_VERSION}+${CUDA_VERSION} \
-    torchvision==0.12.0+${CUDA_VERSION} \
+ARG CUDANAME=cu113
+RUN pip install --user torch==${PYTORCH_VERSION}+${CUDANAME} \
+    torchvision==0.12.0+${CUDANAME} \
     torchaudio===0.11.0 -f https://download.pytorch.org/whl/cu113/torch_stable.html 
 
 # # >> ROOT
@@ -46,12 +46,12 @@ RUN cd /tmp && \
 		-Dminuit2=ON -Dgviz=ON -Drpath=ON -Dgnuinstall=OFF -DCMAKE_CXX_STANDARD=17 -Droot7=ON\
 		-DCMAKE_CXX_COMPILER=`which g++` -DCMAKE_C_COMPILER=`which gcc` \
 	&& cmake --build . --target install -- -j4 \
-	&& cd  && rm -rf /code && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
+	&& cd  && rm -rf /tmp/* && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
 
-    # && pip install --user torch-scatter -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDA_VERSION}.html \
-    # && pip install --user torch-sparse  -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDA_VERSION}.html \
-    # && pip install --user torch-cluster -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDA_VERSION}.html \
-    # && pip install --user torch-spline-conv -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDA_VERSION}.html \
+    # && pip install --user torch-scatter -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDANAME}.html \
+    # && pip install --user torch-sparse  -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDANAME}.html \
+    # && pip install --user torch-cluster -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDANAME}.html \
+    # && pip install --user torch-spline-conv -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDANAME}.html \
     # && pip install --user torch-geometric \
     # && pip install --user tensorflow_gpu==2.5 \
 	# && pip install --user pytorch-lightning \
