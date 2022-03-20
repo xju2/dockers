@@ -1,5 +1,5 @@
 # docexoty/exasvc:ubuntu20.04
-FROM nvidia/cuda:11.3.1-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.5.1-cudnn8-devel-ubuntu20.04
 
 # ROOT core dependences.
 RUN apt-get update -y && DEBIAN_FRONTEND="noninteractive" TZ="America/Los_Angeles" apt-get -y install \
@@ -47,6 +47,15 @@ RUN cd /tmp && \
 		-DCMAKE_CXX_COMPILER=`which g++` -DCMAKE_C_COMPILER=`which gcc` \
 	&& cmake --build . --target install -- -j4 \
 	&& cd  && rm -rf /tmp/* && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
+
+
+# Install cmake
+ARG CMAKE_VERSION=3.22.3
+RUN cd /tmp && \
+    wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-x86_64.sh && \
+    bash cmake-${CMAKE_VERSION}-linux-x86_64.sh --prefix=/usr/local --exclude-subdir --skip-license \
+	&& rm -rf /tmp/*
+
 
     # && pip install --user torch-scatter -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDANAME}.html \
     # && pip install --user torch-sparse  -f https://pytorch-geometric.com/whl/torch-${PYTORCH_VERSION}+${CUDANAME}.html \
