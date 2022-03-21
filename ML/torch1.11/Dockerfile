@@ -31,17 +31,19 @@ RUN source activate rapids && \
         -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} && \
     make -j4 && make install && rm -rf /tmp/*
 
-# Triton Client
-RUN source activate rapids && cd /tmp && \
-    git clone --recursive https://github.com/triton-inference-server/client.git && \
-    cd client && mkdir build && cd build && \
-    cmake -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} \
-        -DTRITON_ENABLE_CC_HTTP=ON \
-        -DTRITON_ENABLE_CC_GRPC=ON \
-        -DTRITON_ENABLE_PERF_ANALYZER=ON \
-        -DTRITON_ENABLE_GPU=ON \
-        -DTRITON_ENABLE_EXAMPLES=OFF \
-        -DTRITON_ENABLE_TESTS=OFF \
-        -DCMAKE_C_COMPILER=`which gcc` \
-        -DCMAKE_CXX_COMPILER=`which g++` .. && \
-        make -j4 cc-clients && make install && rm -rf /tmp/*
+RUN source activate rapids && mamba install -y opencv rapidjson
+
+# # Triton Client
+# RUN source activate rapids && cd /tmp && \
+#     git clone --recursive https://github.com/triton-inference-server/client.git && \
+#     cd client && mkdir build && cd build && \
+#     cmake -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX} \
+#         -DTRITON_ENABLE_CC_HTTP=ON \
+#         -DTRITON_ENABLE_CC_GRPC=ON \
+#         -DTRITON_ENABLE_PERF_ANALYZER=ON \
+#         -DTRITON_ENABLE_GPU=ON \
+#         -DTRITON_ENABLE_EXAMPLES=OFF \
+#         -DTRITON_ENABLE_TESTS=OFF \
+#         -DCMAKE_C_COMPILER=`which gcc` \
+#         -DCMAKE_CXX_COMPILER=`which g++` .. && \
+#         make -j4 cc-clients && make install && rm -rf /tmp/*
