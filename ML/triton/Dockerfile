@@ -101,7 +101,7 @@ RUN cd /tmp && \
 	git clone --recursive https://github.com/pytorch/pytorch.git && cd pytorch && \
 	git checkout -b r1.11 origin/release/1.11 && \
 	git submodule sync && git submodule update --init --recursive --jobs 0 && \
-	USE_CUDA=1 USE_OPENMP=1 USE_MPI=1 USE_TBB=1 USE_SYSTEM_TBB=1 USE_MKLDNN=1 \
+	USE_CUDA=1 USE_OPENMP=1 USE_MPI=0 USE_TBB=1 USE_SYSTEM_TBB=1 USE_MKLDNN=1 \
 	MKL_THREADING=TBB MKLDNN_CPU_RUNTIME=TBB BUILD_BINARY=1 BUILD_CUSTOM_PROTOBUF=OFF \
 	CMAKE_PREFIX_PATH=/workspace/build/third-party/protobuf python setup.py install --prefix=/usr/local && \
 	rm -rf /tmp/*
