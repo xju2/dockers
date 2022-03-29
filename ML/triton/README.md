@@ -15,6 +15,7 @@
     * mkl
     * eigen3
     * tbb
+    * CUDA &#x21d2; 11.6
     
 
 * HEP Packages:
@@ -24,4 +25,3 @@
     * FastJet3 &#x21d2; 3.4.0
     * LHAPDF &#x21d2; 6.2.3
     * Pythia &#x21d2; 8.302
-
