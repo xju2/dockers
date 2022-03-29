@@ -68,12 +68,8 @@ RUN mkdir /code && cd /code && \
 
 ENV PYTHIA8DATA=/usr/local/share/Pythia8/xmldoc/
 
-RUN pip install -y Sphinx
 # ARG PYTORCH_VERSION=1.11.0 
 # ARG CUDANAME=cu115
-
-# RUN apt-get update -y && apt-get -y install \
-#     doxygen
 
 # RUN /usr/bin/python3 -m pip install --upgrade pip && pip install torch==${PYTORCH_VERSION}+${CUDANAME} \
 #     -f https://download.pytorch.org/whl/${CUDANAME}/torch_stable.html
@@ -86,6 +82,28 @@ RUN pip install -y Sphinx
 #         -DCMAKE_INSTALL_PREFIX=/usr/local && \
 #     make -j4 && make install && rm -rf /tmp/*
 
-# COPY deps.tar.gz /usr/local 
-# RUN cd /usr/local && tar xzf deps.tar.gz && rm deps.tar.gz
-# RUN apt-get update -y && apt-get install -y libboost-all-dev
+COPY deps.tar.gz /usr/local 
+RUN cd /usr/local && tar xzf deps.tar.gz && rm deps.tar.gz
+
+RUN apt-get update -y && apt-get install -y \
+    libhdf5-mpich-dev libomp-dev libmkl-full-dev ccache && \
+	rm -rf /var/lib/apt/lists/* && \
+	pip install Sphinx mkl-devel typing_extensions ninja
+
+RUN /usr/sbin/update-ccache-symlinks
+RUN mkdir /opt/ccache && ccache --set-config=cache_dir=/opt/ccache
+
+RUN mkdir -p /opt/hpcx/ompi/lib/x86_64-linux-gnu && \
+    cd /opt/hpcx/ompi/lib/x86_64-linux-gnu && \
+	ln -s /opt/hpcx/ompi openmpi
+
+RUN cd /tmp && \
+	git clone --recursive https://github.com/pytorch/pytorch.git && cd pytorch && \
+	git checkout -b r1.11 origin/release/1.11 && \
+	git submodule sync && git submodule update --init --recursive --jobs 0 && \
+	USE_CUDA=1 USE_OPENMP=1 USE_MPI=1 USE_TBB=1 USE_SYSTEM_TBB=1 USE_MKLDNN=1 \
+	MKL_THREADING=TBB MKLDNN_CPU_RUNTIME=TBB BUILD_BINARY=1 BUILD_CUSTOM_PROTOBUF=OFF \
+	CMAKE_PREFIX_PATH=/workspace/build/third-party/protobuf python setup.py install --prefix=/usr/local && \
+	rm -rf /tmp/*
+
+ENV PYTHONPATH=${PYTHONPATH}:/usr/local/lib/python3.8/site-packages
