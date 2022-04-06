@@ -16,5 +16,8 @@ RUN yum -y update && yum install -y zlib-devel vim \
     pciutils-devel perl-ExtUtils-Embed texlive-dvipng-bin xcb-proto \
     xorg-x11-xtrans-devel zsh
 
+RUN sed '/gcclocation/d' /home/atlas/.asetup > /home/atlas/.asetup.tmp && \
+    mv /home/atlas/.asetup.tmp /home/atlas/.asetup
+
 # https://code.visualstudio.com/docs/setup/linux#_visual-studio-code-is-unable-to-watch-for-file-changes-in-this-large-workspace-error-enospc
 #RUN echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf  && sysctl -p
