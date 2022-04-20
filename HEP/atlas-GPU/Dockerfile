@@ -1,4 +1,4 @@
-# docexoty/centos7-atlasos-gpu:base
+# docexoty/centos7-atlasos-gpu
 # https://gitlab.cern.ch/atlas-sit/docker/-/blob/master/centos7-atlasos/Dockerfile
 # CC7 OS capable of using/running the ATLAS software release(s).
 
@@ -65,3 +65,11 @@ CMD /bin/bash
 
 # https://code.visualstudio.com/docs/setup/linux#_visual-studio-code-is-unable-to-watch-for-file-changes-in-this-large-workspace-error-enospc
 #RUN echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf  && sysctl -p
+
+RUN mkdir /home/atlas/python3.9
+ENV PYTHONUSERBASE="/home/atlas/python3.9"
+ENV PATH=${PYTHONUSERBASE}/bin:$PATH
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/home/atlas/python3.9/lib:${PYTHONUSERBASE}/lib/python3.9/site-packages/lib
+ENV PYTHONPATH=${PYTHONPATH}:${PYTHONUSERBASE}/lib/python3.9/site-packages/
+
+# RUN sudo yum -y update && sudo yum -y install python3-pip && pip3 install --user typing_extensions
