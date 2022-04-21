@@ -71,5 +71,3 @@ ENV PYTHONUSERBASE="/home/atlas/python3.9"
 ENV PATH=${PYTHONUSERBASE}/bin:$PATH
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/home/atlas/python3.9/lib:${PYTHONUSERBASE}/lib/python3.9/site-packages/lib
 ENV PYTHONPATH=${PYTHONPATH}:${PYTHONUSERBASE}/lib/python3.9/site-packages/
-
-# RUN sudo yum -y update && sudo yum -y install python3-pip && pip3 install --user typing_extensions
