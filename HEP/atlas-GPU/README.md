@@ -1,4 +1,4 @@
-# Find CUDA Home
+# Setup global variables
 Find CUDA and TBB and ZLIB
 ```bash
 export CUDA_HOME=/cvmfs/atlas.cern.ch/repo/sw/software/22.0/sw/lcg/releases/cuda/11.4-166ec/x86_64-centos7-gcc11-opt/
@@ -8,6 +8,7 @@ export ZLIB_HOME=/cvmfs/atlas.cern.ch/repo/sw/software/22.0/sw/lcg/releases/LCG_
 export RANGEV3_HOME=/cvmfs/atlas.cern.ch/repo/sw/software/22.0/sw/lcg/releases/LCG_101_ATLAS_14/rangev3/0.11.0/x86_64-centos7-gcc11-opt
 export fmt_HOME=/cvmfs/sft.cern.ch/lcg/views/LCG_101_ATLAS_14/x86_64-centos7-gcc11-opt/lib64/cmake/fmt
 export Boost_HOME=/cvmfs/sft.cern.ch/lcg/views/LCG_101_ATLAS_14/x86_64-centos7-gcc11-opt
+export LD_LIBRARY_PATH=/opt/onnxruntime/lib64:/home/atlas/python3.9/lib/python3.9/site-packages/torch/lib:$LD_LIBRARY_PATH
 ```
 
 # Install Pytorch
@@ -77,7 +78,7 @@ Optional to install the python packages `pip install dist/*`.
 
 * Configure
 ```bash
-export LD_LIBRARY_PATH=/opt/onnxruntime/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/opt/onnxruntime/lib64:/home/atlas/python3.9/lib/python3.9/site-packages/torch/lib:$LD_LIBRARY_PATH
 ```
 
 # Install kineto
@@ -115,4 +116,9 @@ cmake -DCMAKE_MODULE_PATH=/home/atlas/projects/tracking/integrateToAthena/cmake 
 # onnxruntime example
 ```bash
 athena x86_64-centos7-gcc11-opt/jobOptions/AthExOnnxRuntime/AthExOnnxRuntime_jobOptions.py
+```
+
+# Exa.TrkX example
+```bash
+athena x86_64-centos7-gcc11-opt/jobOptions/SiSPGNNTrackFinder/SiSPSeededGNNTracksStandaloneFromESD.py
 ```
