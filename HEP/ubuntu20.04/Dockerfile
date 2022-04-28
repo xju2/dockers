@@ -280,3 +280,16 @@ ENV G4ENSDFSTATEDATA=${G4DATA}/G4ENSDFSTATE2.2 \
     G4RADIOACTIVEDATA=${G4DATA}/RadioactiveDecay5.4 \
     G4LEDATA=${G4DATA}/G4EMLOW7.9.1 \
     G4NEUTRONHPDATA=${G4DATA}/G4NDL4.6
+
+# install HPX
+RUN cd /code && \
+	&& git clone https://github.com/STEllAR-GROUP/hpx.git && cd hpx && git checkout 1.7.1 \
+	&& mkdir build && cd build \
+	&& cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+		-DCMAKE_C_COMPILER=`which gcc` \
+		-DCMAKE_CXX_COMPILER=`which g++` \
+		-DHPX_WITH_CUDA=ON \
+		-DHPX_WITH_EXAMPLES_TBB=ON \
+  		-DTBB_LIBRARY=/usr/local/lib/libtbbmalloc.so.2 \
+  		-DBOOST_ROOT=/opt/conda/envs/rapids \
+	&& make install -j4 && rm -rf *

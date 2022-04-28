@@ -1,5 +1,6 @@
 # Introduction
 
+Image Name: `docexoty/exatrkx:triton-rapids`. It contains:
 * Base Image: `nvcr.io/nvidia/tritonserver:22.02-py3-sdk`
 * OS: `ubuntu 20.04`
 

@@ -69,5 +69,5 @@ CMD /bin/bash
 RUN mkdir /home/atlas/python3.9
 ENV PYTHONUSERBASE="/home/atlas/python3.9"
 ENV PATH=${PYTHONUSERBASE}/bin:$PATH
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/home/atlas/python3.9/lib:${PYTHONUSERBASE}/lib/python3.9/site-packages/lib
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/onnxruntime/lib64:/home/atlas/python3.9/lib/python3.9/site-packages/torch/lib:/home/atlas/python3.9/lib:${PYTHONUSERBASE}/lib/python3.9/site-packages/lib
 ENV PYTHONPATH=${PYTHONPATH}:${PYTHONUSERBASE}/lib/python3.9/site-packages/

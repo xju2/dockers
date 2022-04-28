@@ -1,3 +1,14 @@
+# Docker image information
+Image Name: `docexoty/centos7-atlasos-gpu`. 
+* Base Image: `nvidia/cuda:11.4.2-devel-centos7`
+* OS: `CentOS7`
+
+
+# Setup after 
+```bash
+export LD_LIBRARY_PATH=/opt/onnxruntime/lib64:/home/atlas/python3.9/lib/python3.9/site-packages/torch/lib:$LD_LIBRARY_PATH
+```
+
 # Setup global variables
 Find CUDA and TBB and ZLIB
 ```bash
