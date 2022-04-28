@@ -4,7 +4,9 @@ Image Name: `docexoty/centos7-atlasos-gpu`.
 * OS: `CentOS7`
 
 
-# Setup after 
+# Daily Setup
+Need to setup the following everytime the container starts.
+I hasitate to put it into the container as it may not needed when all libraries can be found in LCG.
 ```bash
 export LD_LIBRARY_PATH=/opt/onnxruntime/lib64:/home/atlas/python3.9/lib/python3.9/site-packages/torch/lib:$LD_LIBRARY_PATH
 ```
@@ -33,7 +35,7 @@ asetup Athena,22.0.59,here
 pip install --user typing_extensions  pybind11
 ```
 
-* Downlaod and Compile and install
+* Downlaod source code and Compile and install
 ```bash
 MAX_JOBS=6 USE_CUDA=1 USE_OPENMP=1 USE_MPI=0 USE_TBB=1 USE_SYSTEM_TBB=1 \
 USE_MKLDNN=1 MKL_THREADING=TBB MKLDNN_CPU_RUNTIME=TBB BUILD_BINARY=0 \
@@ -61,8 +63,8 @@ git checkout tags/1.11.0 -b v1.11.0
 ```
 
 * Compile
-Attention to `gcc` and `g++`.
-Add ` --skip_submodule_sync` in case the repository is already up to date.
+    * Paths to `gcc` and `g++` are hardcoded.
+    * Add ` --skip_submodule_sync` in case the repository is already up to date.
 
 ```bash
 ./build.sh --cuda_home $CUDA_HOME \
@@ -111,6 +113,18 @@ make -j4 && make install
 ```
 
 # Compile Athena
+
+In the working directory, create a new file `package_filters.txt` with following content.
+```text
++ Control/AthOnnxruntimeUtils
++ Control/AthenaExamples/AthExOnnxRuntime
++ InnerDetector/InDetRecTools/InDetRecToolInterfaces
++ InnerDetector/InDetRecAlgs/SiSPGNNTrackFinder
++ InnerDetector/InDetRecTools/SiGNNTrackFinderTool
+- .*
+```
+Then `mkdir build && cd build `.
+
 ```bash
 cmake -DCMAKE_MODULE_PATH=/home/atlas/projects/tracking/integrateToAthena/cmake \
    -DCMAKE_PREFIX_PATH=$(python -c 'import torch;print(torch.utils.cmake_prefix_path)') \
@@ -130,6 +144,7 @@ athena x86_64-centos7-gcc11-opt/jobOptions/AthExOnnxRuntime/AthExOnnxRuntime_job
 ```
 
 # Exa.TrkX example
+Don't forgot: `source x86_64-centos7-gcc11-opt/setup.sh`.
 ```bash
 athena x86_64-centos7-gcc11-opt/jobOptions/SiSPGNNTrackFinder/SiSPSeededGNNTracksStandaloneFromESD.py
 ```
