@@ -1,8 +1,22 @@
-# Docker image information
+# Introduction
 Image Name: `docexoty/centos7-atlasos-gpu`. 
 * Base Image: `nvidia/cuda:11.4.2-devel-centos7`
 * OS: `CentOS7`
 
+
+# Table of Contents
+- [Introduction](#Introduction)
+- [Daily Setup](#daily-setup)
+- [Setup global variables](#setup-global-variables)
+    - [Install Pytorch](#install-pytorch)
+    - [Install system dependences](#install-system-dependences)
+    - [Install onnxruntime](#install-onnxruntime)
+    - [Install kineto](#install-kineto)
+    - [Install FRNN](#install-frnn)
+- [Compile Athena](#compile-athena)
+- Examples
+    - [Onnxruntime Example](#onnxruntime-example)
+    - [ExaTrkX Example](#exatrkx-example)
 
 # Daily Setup
 Need to setup the following everytime the container starts.
