@@ -1,9 +1,3 @@
-# Introduction
-Image Name: `docexoty/centos7-atlasos-gpu`. 
-* Base Image: `nvidia/cuda:11.4.2-devel-centos7`
-* OS: `CentOS7`
-
-
 # Table of Contents
 - [Introduction](#Introduction)
 - [Daily Setup](#daily-setup)
@@ -17,6 +11,11 @@ Image Name: `docexoty/centos7-atlasos-gpu`.
 - Examples
     - [Onnxruntime Example](#onnxruntime-example)
     - [ExaTrkX Example](#exatrkx-example)
+
+# Introduction
+Image Name: `docexoty/centos7-atlasos-gpu`. 
+* Base Image: `nvidia/cuda:11.4.2-devel-centos7`
+* OS: `CentOS7`
 
 # Daily Setup
 Need to setup the following everytime the container starts.
