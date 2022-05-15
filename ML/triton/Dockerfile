@@ -3,6 +3,8 @@ ARG TRITON_VERSION=22.02-py3-sdk
 FROM nvcr.io/nvidia/tritonserver:${TRITON_VERSION}
 
 # ROOT core dependences
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+
 RUN apt-get update -y && apt-get -y install \
   libx11-dev libxpm-dev libxft-dev libxext-dev libssl-dev  \
   libeigen3-dev libboost-all-dev libtbb-dev rsync doxygen \
@@ -97,13 +99,15 @@ RUN mkdir -p /opt/hpcx/ompi/lib/x86_64-linux-gnu && \
     cd /opt/hpcx/ompi/lib/x86_64-linux-gnu && \
 	ln -s /opt/hpcx/ompi openmpi
 
+## cannot link binaries, disable them.
 RUN cd /tmp && \
 	git clone --recursive https://github.com/pytorch/pytorch.git && cd pytorch && \
 	git checkout -b r1.11 origin/release/1.11 && \
 	git submodule sync && git submodule update --init --recursive --jobs 0 && \
-	MAX_JOBS=6 USE_CUDA=1 USE_OPENMP=1 USE_MPI=0 USE_TBB=1 USE_SYSTEM_TBB=1 USE_MKLDNN=1 \
+	MAX_JOBS=4 USE_CUDA=1 USE_OPENMP=1 USE_MPI=0 USE_TBB=1 USE_SYSTEM_TBB=1 BLAS=Eigen USE_MKLDNN=1 \
 	MKL_THREADING=TBB MKLDNN_CPU_RUNTIME=TBB BUILD_BINARY=0 BUILD_CUSTOM_PROTOBUF=OFF \
-	CMAKE_PREFIX_PATH=/workspace/build/third-party/protobuf python setup.py build --cmake-only && \
-	cmake --build build --config Release --target install 
+	CMAKE_PREFIX_PATH=/workspace/build/third-party/protobuf \
+	TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6" python setup.py install --cmake --prefix=/usr/local && \
+	rm -rf /tmp/pytorch
 
 ENV PYTHONPATH=${PYTHONPATH}:/usr/local/lib/python3.8/site-packages 
