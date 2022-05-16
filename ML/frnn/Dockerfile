@@ -18,7 +18,7 @@ ENV PATH=${CONDA_DIR}/bin:$PATH
 # # create the environment
 RUN source activate && conda create -y -n frnn python=3.8 
 
-# Initialize conda in bash config fiiles:
+# Initialize conda in bash config files:
 RUN conda init bash
 
 RUN source activate frnn && \
@@ -40,7 +40,7 @@ RUN source activate frnn && cd /tmp && \
 ENV PYTHONNOUSERSITE=True
 RUN source activate frnn && cd /tmp/ \
 	&& git clone https://github.com/xju2/prefix_sum.git \
-    && git clone https://github.com/murnanedaniel/FRNN.git \
+    && git clone https://github.com/xju2/FRNN.git \
 	&& cd prefix_sum \
 	&& NVCC_FLAGS="-gencode=arch=compute_61,code=sm_61 -gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_75,code=sm_75 -gencode=arch=compute_80,code=sm_80 -gencode=arch=compute_86,code=sm_86" \
 		python setup.py install \
