@@ -139,7 +139,7 @@ In the working directory, create a new file `package_filters.txt` with following
 Then `mkdir build && cd build `.
 
 ```bash
-cmake -DCMAKE_MODULE_PATH=/home/atlas/projects/tracking/integrateToAthena/cmake \
+cmake -DCMAKE_MODULE_PATH="/home/atlas/projects/tracking/integrateToAthena/cmake:/home/atlas/python3.9/lib/cmake" \
    -DCMAKE_PREFIX_PATH=$(python -c 'import torch;print(torch.utils.cmake_prefix_path)') \
    -DATLAS_PACKAGE_FILTER_FILE=../package_filters.txt \
    -Dcugraph_DIR=/home/atlas/python3.9 \
