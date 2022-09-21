@@ -25,6 +25,8 @@ RUN source activate rapids \
 
 # NV-system for profiling
 # https://docs.nvidia.com/nsight-systems/InstallationGuide/index.html#cuda-support
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+
 RUN apt-get update -y && \
      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          apt-transport-https \
@@ -111,3 +113,4 @@ RUN cd /rapids && \
 		make install && pip install dist/*
 
 RUN source activate rapids && mamba install onnx=1.10.0
+RUN groupadd -g 504 crd && useradd -g 504 -u 47045 --create-home xju

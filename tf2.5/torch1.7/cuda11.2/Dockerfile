@@ -15,9 +15,9 @@ ENV PATH=/usr/local/root/bin:/usr/local/python3.8/bin:$PATH
 ENV PYTHONPATH=${PYTHONPATH}:/usr/lib/python3.8/site-packages:/usr/local/root/lib/root
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
 
-RUN pip install --user sympy numpy scipy numba mpi4py matplotlib seaborn
+RUN pip install --user sympy numpy==1.19.5 pandas==1.4.1 scipy numba mpi4py matplotlib seaborn
 
-RUN pip install --user tensorflow==2.5
+RUN pip install --user tensorflow==2.5 tensorboard==2.8.0
 
 RUN pip install --user torch==1.7.1+cu110 -f https://download.pytorch.org/whl/torch_stable.html 
 
@@ -28,7 +28,7 @@ RUN  pip install --user torch-cluster -f https://pytorch-geometric.com/whl/torch
 	&& pip install --user torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cu110.html \
 	&& pip install --user torch-geometric==1.7.1
 
-RUN HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=1 HOROVOD_GPU_OPERATIONS=NCCL pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
+# RUN HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_GLOO=1 HOROVOD_GPU_OPERATIONS=NCCL pip install --no-cache-dir --user git+https://github.com/horovod/horovod.git@v0.21.3
 
 # NV-system for profiling
 # https://docs.nvidia.com/nsight-systems/InstallationGuide/index.html#cuda-support
@@ -57,3 +57,6 @@ RUN  echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu20
      rm -rf /var/lib/apt/lists/*
 
 RUN pip install --user xgboost && pip install -U "ray[tune]"
+
+RUN pip install --user jupyterlab
+RUN groupadd -g 504 crd && useradd -g 504 -u 47045 --create-home xju
