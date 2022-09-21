@@ -32,4 +32,4 @@ RUN source activate gnn && pip install --upgrade pip &&  pip install matplotlib 
 
 RUN groupadd -g 504 crd && useradd -g 504 -u 47045 --create-home xju
 
-RUN conda activate gnn && conda install -c conda-forge jupyterlab nodejs
+RUN source activate gnn && conda install -c conda-forge jupyterlab nodejs
