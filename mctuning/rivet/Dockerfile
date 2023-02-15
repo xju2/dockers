@@ -1,7 +1,8 @@
 # docexoty/heptools:rivet3.1.6
-FROM hepstore/rivet-pythia:3.1.6
+ARG RIVET_VERSION=3.1.6
+FROM hepstore/rivet-pythia:${RIVET_VERSION}
 
-RUN apt-get update -y && apt-get -y install libhdf5-mpich-dev
+RUN apt-get update -y && apt-get -y install libhdf5-mpich-dev vim
 
 # python pakcages
 RUN ln -s /usr/local/bin/pip /usr/bin/pip && \
