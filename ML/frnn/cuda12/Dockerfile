@@ -14,14 +14,14 @@ RUN wget \
     && rm -f Miniconda3-latest-Linux-x86_64.sh 
 
 ENV PATH=${CONDA_DIR}/bin:$PATH
+ENV PYTHONNOUSERSITE=True
 
 # # create the environment
-RUN source activate && conda create -y -n frnn python=3.10
+RUN source activate && conda create -y -n frnn python=3.9
 
 # Initialize conda in bash config files:
 RUN conda init bash
 
-ENV PYTHONNOUSERSITE=True
 RUN source activate frnn && \
     conda install -y astunparse charset-normalizer pycparser numpy ninja pyyaml mkl mkl-include setuptools cmake \
         cffi typing_extensions future six requests dataclasses \
@@ -44,6 +44,7 @@ RUN source activate frnn && cd /tmp/ \
 	&& NVCC_FLAGS="-gencode=arch=compute_61,code=sm_61 -gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_75,code=sm_75 -gencode=arch=compute_80,code=sm_80 -gencode=arch=compute_86,code=sm_86" \
 		python setup.py install \
     && cd /tmp/FRNN \
+	&& git checkout -b v1.0.0 tags/v1.0.0 \
     && NVCC_FLAGS="-gencode=arch=compute_61,code=sm_61 -gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_75,code=sm_75 -gencode=arch=compute_80,code=sm_80 -gencode=arch=compute_86,code=sm_86" \
 		python setup.py install && \
 	rm -rf /tmp/prefix_sum && rm -rf /tmp/FRNN 
