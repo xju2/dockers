@@ -38,7 +38,7 @@ RUN source activate frnn && cd /tmp && \
 	rm -rf /tmp/pytorch
 
 RUN source activate frnn && cd /tmp/ \
-	&& git clone https://github.com/xju2/prefix_sum.git \
+	&& git clone https://github.com/asnaylor/prefix_sum.git \
     && git clone https://github.com/xju2/FRNN.git \
 	&& cd prefix_sum \
 	&& NVCC_FLAGS="-gencode=arch=compute_61,code=sm_61 -gencode=arch=compute_70,code=sm_70 -gencode=arch=compute_75,code=sm_75 -gencode=arch=compute_80,code=sm_80 -gencode=arch=compute_86,code=sm_86" \
