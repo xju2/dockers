@@ -20,18 +20,19 @@ ENV PYTHONNOUSERSITE=True
 RUN conda init bash
 
 # Install cugraph
+ARG MAX_CORE=4
 RUN cd /tmp && export CUGRAPH_HOME=$(pwd)/cugraph && \
 	git clone --recursive -b branch-23.06 https://github.com/rapidsai/cugraph.git && cd cugraph && \
 	source activate && \
 	conda env create --name cugraph --file conda/environments/all_cuda-118_arch-x86_64.yaml && \
 	source activate cugraph && \
 	./build.sh clean && \
-	PARALLEL_LEVEL=6 ./build.sh libcugraph --allgpuarch --skip_cpp_tests && \
-	PARALLEL_LEVEL=6 ./build.sh libcugraph_etl --allgpuarch --skip_cpp_tests && \
-	PARALLEL_LEVEL=6 ./build.sh pylibcugraph --allgpuarch --skip_cpp_tests && \
-	PARALLEL_LEVEL=6 ./build.sh cugraph --allgpuarch --skip_cpp_tests && \
+	PARALLEL_LEVEL=${MAX_CORE} ./build.sh libcugraph --allgpuarch --skip_cpp_tests && \
+	PARALLEL_LEVEL=${MAX_CORE} ./build.sh libcugraph_etl --allgpuarch --skip_cpp_tests && \
+	PARALLEL_LEVEL=${MAX_CORE} ./build.sh pylibcugraph --allgpuarch --skip_cpp_tests && \
+	PARALLEL_LEVEL=${MAX_CORE} ./build.sh cugraph --allgpuarch --skip_cpp_tests && \
 	rm -rf /tmp/cugraph 
 
 RUN source activate cugraph && \
-	conda install conda-pack && \
+	conda install ctools/label/dev::conda-pack && \
 	conda install -y -c esrf-bcu libnuma
