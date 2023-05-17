@@ -1,4 +1,5 @@
 # docexoty/exatrkx:cugraph-cuda12
+ARG MAX_CORE=4
 FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu20.04
 
 RUN apt-get update -y  && DEBIAN_FRONTEND="noninteractive" TZ="America/Los_Angeles"  apt-get -y install \
@@ -20,10 +21,9 @@ ENV PYTHONNOUSERSITE=True
 RUN conda init bash
 
 # Install cugraph
-ARG MAX_CORE=4
 RUN cd /tmp && export CUGRAPH_HOME=$(pwd)/cugraph && \
 	git clone --recursive -b branch-23.06 https://github.com/rapidsai/cugraph.git && cd cugraph && \
-	source activate && \
+	source ${CONDA_DIR}/bin/activate && \
 	conda env create --name cugraph --file conda/environments/all_cuda-118_arch-x86_64.yaml && \
 	source activate cugraph && \
 	./build.sh clean && \
