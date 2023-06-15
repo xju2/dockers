@@ -64,3 +64,84 @@ RUN mkdir src \
   && cmake --build build -- install \
   && rm -rf build src
 
+
+# Geant4
+RUN mkdir src \
+  && ${GET} https://gitlab.cern.ch/geant4/geant4/-/archive/v11.1.1/geant4-v11.1.1.tar.gz \
+    | ${UNPACK_TO_SRC} \
+  && cmake -B build -S src -GNinja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+    -DGEANT4_BUILD_TLS_MODEL=global-dynamic \
+    -DGEANT4_INSTALL_DATA=ON \
+    -DGEANT4_USE_GDML=ON \
+    -DGEANT4_USE_SYSTEM_EXPAT=ON \
+    -DGEANT4_USE_SYSTEM_ZLIB=ON \
+  && cmake --build build -- install \
+  && rm -rf build src
+
+ENV G4DATA=/usr/local/share/Geant4/data
+ENV G4ENSDFSTATEDATA=${G4DATA}/G4ENSDFSTATE2.3 \
+    G4LEVELGAMMADATA=${G4DATA}/PhotonEvaporation5.7 \
+    G4PARTICLEXSDATA=${G4DATA}/G4PARTICLEXS4.0 \
+    G4RADIOACTIVEDATA=${G4DATA}/RadioactiveDecay5.6 \
+    G4LEDATA=${G4DATA}/G4EMLOW8.2 \
+    G4NEUTRONHPDATA=${G4DATA}/G4NDL4.7
+
+# environment variables needed to find ROOT libraries
+ENV LD_LIBRARY_PATH /usr/local/lib
+ENV PYTHON_PATH /usr/local/lib
+
+# nlohmann's JSON
+RUN mkdir src \
+  && ${GET} https://github.com/nlohmann/json/archive/refs/tags/v3.11.2.tar.gz \
+    | ${UNPACK_TO_SRC} \
+  && cmake -B build -S src -GNinja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DJSON_BuildTests=OFF \
+  && cmake --build build -- install \
+  && rm -rf build src
+
+# podio
+RUN mkdir src \
+  && ${GET} https://github.com/AIDASoft/podio/archive/refs/tags/v00-16-03.tar.gz \
+    | ${UNPACK_TO_SRC} \
+  && cmake -B build -S src -GNinja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+    -DBUILD_TESTING=OFF \
+    -USE_EXTERNAL_CATCH2=OFF \
+  && cmake --build build -- install \
+  && rm -rf build src
+
+# EDM4hep
+RUN pip3 install jinja2 pyyaml \
+  && mkdir src \
+  && ${GET} https://github.com/key4hep/EDM4hep/archive/refs/tags/v00-07-02.tar.gz \
+    | ${UNPACK_TO_SRC} \
+  && cmake -B build -S src -GNinja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+    -DBUILD_TESTING=OFF \
+    -DUSE_EXTERNAL_CATCH2=OFF \
+  && cmake --build build -- install \
+  && rm -rf build src
+
+# DD4hep
+# requires Geant4 and ROOT and must come last
+RUN mkdir src \
+  && ${GET} https://github.com/AIDASoft/DD4hep/archive/v01-25-01.tar.gz \
+    | ${UNPACK_TO_SRC} \
+  && cmake -B build -S src -GNinja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_CXX_STANDARD=17 \
+    -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+    -DCMAKE_PREFIX_PATH=${PREFIX} \
+    -DBUILD_TESTING=OFF \
+    -DDD4HEP_BUILD_PACKAGES="DDG4 DDDetectors DDRec UtilityApps" \
+    -DDD4HEP_IGNORE_GEANT4_TLS=ON \
+    -DDD4HEP_USE_GEANT4=ON \
+    -DDD4HEP_USE_XERCESC=ON \
+    -DDD4HEP_USE_EDM4HEP=ON \
+  && cmake --build build -- install \
+  && rm -rf build src
