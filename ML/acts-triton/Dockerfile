@@ -145,3 +145,33 @@ RUN mkdir src \
     -DDD4HEP_USE_EDM4HEP=ON \
   && cmake --build build -- install \
   && rm -rf build src
+
+
+# Require cmake 3.21.2 or higher. The previous version is 3.21.2
+RUN mkdir src \
+  && ${GET} https://github.com/Kitware/CMake/releases/download/v3.26.4/cmake-3.26.4-Linux-x86_64.tar.gz \
+    | ${UNPACK_TO_SRC} \
+  && rsync -ruv src/ ${PREFIX} \
+  && cd .. \
+  && rm -rf src
+
+RUN apt-get install -y libblas-dev liblapack-dev swig
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+RUN pip3 install numpy
+# Faiss for fast similarity search
+RUN mkdir src \
+  && ${GET} https://github.com/facebookresearch/faiss/archive/refs/tags/v1.7.4.tar.gz \
+    | ${UNPACK_TO_SRC} \
+    && cd src && mkdir build && cd build \
+    && cmake .. -DFAISS_ENABLE_GPU=ON -DFAISS_ENABLE_PYTHON=ON \
+        -DFAISS_ENABLE_C_API=ON \
+        -DCMAKE_CUDA_ARCHITECTURES="60-real;70-real;75-real;80" \
+        -DPython_EXECUTABLE=/usr/bin/python -DPython_LIBRARIES=/usr/lib/python3.8 \
+        -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+    && make -j faiss && make -j swigfaiss \
+    && cd faiss/python && pip3 install . \
+    && cd ../.. && make install && cd .. \
+    && rm -rf src
+
+RUN apt-get install -y libmkl-full-dev && pip3 install mkl-devel
