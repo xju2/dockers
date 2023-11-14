@@ -69,20 +69,28 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp/ \
 		python setup.py install && \
 	rm -rf /tmp/prefix_sum && rm -rf /tmp/FRNN
 
-# Python packages
-RUN source activate $CONDA_ENV_NAME && pip3 install torch lightning \
-  && pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.1.0+cu121.html \
-  && pip install torch_geometric \
-  && pip install scipy pandas matplotlib uproot tqdm ipykernel atlasify networkx seaborn wandb 
-
-# Rapids packages
-RUN source activate $CONDA_ENV_NAME && pip install \
-    --extra-index-url=https://pypi.nvidia.com \
-    cudf-cu12 dask-cudf-cu12 cuml-cu12 cugraph-cu12 cuspatial-cu12 cuproj-cu12 cuxfilter-cu12 cucim
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64:/usr/lib64/mpich/lib:/usr/local/lib:/opt/conda/envs/gnn4itk/lib/python3.9/site-packages/torch/lib
 
 # additional Python package needed for acorn
 RUN source activate ${CONDA_ENV_NAME} && pip install git+https://github.com/LAL/trackml-library.git \
-  pyyaml click pytest pytest-cov class-resolver
+  pyyaml click pytest pytest-cov class-resolver scipy pandas matplotlib uproot tqdm ipykernel atlasify networkx seaborn wandb 
+
+# Rapids AI
+# cudf-cu12 dask-cudf-cu12 cuml-cu12 cugraph-cu12 cuspatial-cu12 cuproj-cu12 cuxfilter-cu12 cucim
+RUN source activate $CONDA_ENV_NAME && pip install \
+    --extra-index-url=https://pypi.nvidia.com \
+    cudf-cu12 cugraph-cu12
+
+ENV TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6"
+
+# # torch scatter
+RUN source activate $CONDA_ENV_NAME && cd /tmp/ && mkdir src \
+	&& wget https://github.com/rusty1s/pytorch_scatter/archive/refs/tags/2.1.2.tar.gz -O- | tar -xz --strip-components=1 --directory src \
+	&& cd src && python setup.py install && rm -rf /tmp/src
+
+# pyg and lightning
+RUN source activate $CONDA_ENV_NAME \
+  && pip install torch_geometric lightning
 
 # # >> ROOT
 # RUN source activate $CONDA_ENV_NAME && cd /tmp \
