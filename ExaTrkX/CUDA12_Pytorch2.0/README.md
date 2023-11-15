@@ -13,3 +13,17 @@ frnn FOUND
 cugraph:  23.10.00
 torch_scatter:  2.1.2
 ```
+
+## Instructions
+
+
+### Perlmutter
+To pull the container, via podman-hpc
+```bash
+podman-hpc pull docker.io/docexoty/exatrkx:cuda12-pytorch2.1
+```
+
+To run the container, via podman-hpc
+```bash
+podman-hpc run -it --rm --gpu -v $PWD:$PWD -v $SCRATCH:/scratch -v /global/cfs/cdirs/m3443:/m3443 -w $PWD docker.io/docexoty/exatrkx:cuda12-pytorch2.1 bash
+```
