@@ -27,3 +27,7 @@ To run the container, via podman-hpc
 ```bash
 podman-hpc run -it --rm --gpu -v $PWD:$PWD -v $SCRATCH:/scratch -v /global/cfs/cdirs/m3443:/m3443 -w $PWD docker.io/docexoty/exatrkx:cuda12-pytorch2.1 bash
 ```
+And then activate the `conda` environment
+```bash
+source activate gnn4itk
+```
