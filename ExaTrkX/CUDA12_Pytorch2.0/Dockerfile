@@ -1,4 +1,4 @@
-# docexoty/exatrkx:cuda12-pytorch2.1
+cexoty/exatrkx:cuda12-pytorch2.1
 
 FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu20.04
 
