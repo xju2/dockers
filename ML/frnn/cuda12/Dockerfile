@@ -14,10 +14,9 @@ RUN wget \
     && rm -f Miniconda3-latest-Linux-x86_64.sh 
 
 ENV PATH=${CONDA_DIR}/bin:$PATH
-ENV PYTHONNOUSERSITE=True
 
-# # create the environment
-RUN source activate && conda create -y -n frnn python=3.9
+# create the environment
+RUN source activate && conda create -y -n frnn python=3.8
 
 # Initialize conda in bash config files:
 RUN conda init bash
@@ -33,10 +32,13 @@ RUN source activate frnn && cd /tmp && \
 	git clone --recursive https://github.com/pytorch/pytorch.git && cd pytorch && \
 	git checkout -b r2.0 origin/release/2.0 && \
 	git submodule sync && git submodule update --init --recursive --jobs 0 && \
-	MAX_JOBS=4 USE_CUDA=1 CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"} \
-	TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6" python setup.py install && \
+	MAX_JOBS=4 USE_CUDA=1 BUILD_TEST=0 USE_FBGEMM=0 USE_QNNPACK=0 USE_DISTRIBUTED=0 BUILD_CAFFE2=0 DEBUG=0 \
+	  CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"} \
+	  TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6" python setup.py install && \
 	rm -rf /tmp/pytorch
 
+# FRNN
+ENV PYTHONNOUSERSITE=True
 RUN source activate frnn && cd /tmp/ \
 	&& git clone https://github.com/asnaylor/prefix_sum.git \
     && git clone https://github.com/xju2/FRNN.git \

@@ -1,4 +1,4 @@
-cexoty/exatrkx:cuda12-pytorch2.1
+# docexoty/exatrkx:cuda12-pytorch2.1
 
 FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu20.04
 
@@ -51,7 +51,7 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp && \
 	git clone --recursive https://github.com/pytorch/pytorch.git && cd pytorch && \
 	git checkout -b r2.1 origin/release/2.1 && \
 	git submodule sync && git submodule update --init --recursive --jobs 0 && \
-	MAX_JOBS=4 USE_CUDA=1 BUILD_TEST=0 USE_FBGEMM=1 USE_QNNPACK=1 USE_DISTRIBUTED=1 BUILD_CAFFE2=1 DEBUG=0 \
+	MAX_JOBS=4 USE_CUDA=1 BUILD_TEST=0 USE_FBGEMM=0 USE_QNNPACK=0 USE_DISTRIBUTED=1 BUILD_CAFFE2=0 DEBUG=0 \
 	  CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"} \
 	  TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6" python setup.py install && \
 	rm -rf /tmp/pytorch
@@ -79,14 +79,14 @@ RUN source activate ${CONDA_ENV_NAME} && pip install git+https://github.com/LAL/
 # cudf-cu12 dask-cudf-cu12 cuml-cu12 cugraph-cu12 cuspatial-cu12 cuproj-cu12 cuxfilter-cu12 cucim
 RUN source activate $CONDA_ENV_NAME && pip install \
     --extra-index-url=https://pypi.nvidia.com \
-    cudf-cu12 cugraph-cu12
+    cudf-cu12 cugraph-cu12 nx-cugraph-cu12
 
 ENV TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6"
 
 # # torch scatter
 RUN source activate $CONDA_ENV_NAME && cd /tmp/ && mkdir src \
 	&& wget https://github.com/rusty1s/pytorch_scatter/archive/refs/tags/2.1.2.tar.gz -O- | tar -xz --strip-components=1 --directory src \
-	&& cd src && python setup.py install && rm -rf /tmp/src
+	&& cd src && FORCE_CUDA=1 pip install torch-scatter && rm -rf /tmp/src
 
 # pyg and lightning
 RUN source activate $CONDA_ENV_NAME \
