@@ -92,6 +92,12 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp/ && mkdir src \
 RUN source activate $CONDA_ENV_NAME \
   && pip install torch_geometric lightning
 
+# ACORN
+RUN source activate ${CONDA_ENV_NAME} && mkdir /code/ && cd /code \
+  && git clone https://gitlab.cern.ch/gnn4itkteam/commonframework.git \
+  && cd commonframework && git checkout -b 15-migrate-to-pytorch-lightning-2-0-0 origin/15-migrate-to-pytorch-lightning-2-0-0 \
+  && pip install -e .
+
 # # >> ROOT
 # RUN source activate $CONDA_ENV_NAME && cd /tmp \
 #   	&& wget https://root.cern/download/root_v6.28.06.source.tar.gz -O- | tar xz \
