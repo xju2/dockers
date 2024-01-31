@@ -1,4 +1,5 @@
-# docexoty/exatrkx:cuda12-pytorch2.1
+# docexoty/exatrkx:cuda12-pyg2.2
+
 FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu20.04
 
 # ROOT core dependences.
@@ -89,7 +90,7 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp/ && mkdir src \
 
 # pyg and lightning
 RUN source activate $CONDA_ENV_NAME \
-  && pip install torch_geometric lightning
+  && pip install torch_geometric==2.2.0 lightning
 
 # # ACORN
 # RUN source activate ${CONDA_ENV_NAME} && mkdir /code/ && cd /code \
@@ -98,13 +99,10 @@ RUN source activate $CONDA_ENV_NAME \
 #   && pip install -e .
 
 # # >> ROOT
-ARG ROOT_VERSION=6.24.06
-RUN source activate $CONDA_ENV_NAME && cd /tmp \
-  	&& wget https://root.cern/download/root_v${ROOT_VERSION}.source.tar.gz -O- | tar xz \
-  	&& mkdir root_builder && cd root_builder \
-	&& cmake -DCMAKE_INSTALL_PREFIX=/usr/local/root ../root-${ROOT_VERSION} \
-		-Dminuit2=ON -Dgviz=ON -Drpath=ON -Dgnuinstall=OFF -DCMAKE_CXX_STANDARD=17 -Droot7=ON -Dxrootd=OFF -DPYTHON_EXECUTABLE=/opt/conda/envs/gnn4itk/bin/python \
-	&& cmake --build . --target install -- -j4 \
-	&& cd  && rm -rf /tmp/root-* && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
-
-RUN source activate $CONDA_ENV_NAME && pip install hydra-core==1.2.0 hydra-colorlog==1.2.0 hydra-optuna-sweeper==1.2.0  pyrootutils pre-commit rich pytest
+# RUN source activate $CONDA_ENV_NAME && cd /tmp \
+#   	&& wget https://root.cern/download/root_v6.28.06.source.tar.gz -O- | tar xz \
+#   	&& mkdir root_builder && cd root_builder \
+# 	&& cmake -DCMAKE_INSTALL_PREFIX=/usr/local/root ../root-6.28.06 \
+# 		-Dminuit2=ON -Dgviz=ON -Drpath=ON -Dgnuinstall=OFF -DCMAKE_CXX_STANDARD=17 -Droot7=ON \
+# 	&& cmake --build . --target install -- -j4 \
+# 	&& cd  && rm -rf /tmp/root-6.28.06 && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc

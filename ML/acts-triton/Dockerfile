@@ -1,4 +1,4 @@
-# docexoty/acts-triton:latest
+# docexoty/acts-triton
 # Based on https://github.com/acts-project/machines/blob/master/ubuntu2004_exatrkx/Dockerfile
 
 from ghcr.io/acts-project/ubuntu2004_exatrkx
@@ -175,3 +175,7 @@ RUN mkdir src \
     && rm -rf src
 
 RUN apt-get install -y libmkl-full-dev && pip3 install mkl-devel
+
+RUN python -m pip install "dask[complete]" && python -m pip install "dask[diagnostics]" \
+   && python -m pip install "dask[distributed]" &&  python -m pip install "dask[dataframe]" \
+    && python -m pip install "dask[array]" && pip3 install jupyterlab 
