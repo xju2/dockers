@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    name: Build ExaTrkX Docker
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: | 
+        cd ExaTrkX/CUDA12_Pytorch2.0 
+        docker build . --file Dockerfile --tag docexoty/exatrkx:cuda12-pytorch2.1
+
+    - name: Push the Docker image
+      run: docker push docexoty/exatrkx:cuda12-pytorch2.1
