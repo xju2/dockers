@@ -108,3 +108,11 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp \
 	&& cd  && rm -rf /tmp/root-* && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
 
 RUN source activate $CONDA_ENV_NAME && pip install hydra-core==1.2.0 hydra-colorlog==1.2.0 hydra-optuna-sweeper==1.2.0  pyrootutils pre-commit rich pytest
+
+# install airflow
+ENV AIRFLOW_HOME $HOME/airflow
+ENV AIRFLOW_VERSION 2.8.1
+RUN source activate $CONDA_ENV_NAME \
+&& PYTHON_VERSION="$(python --version | cut -d " " -f 2 | cut -d "." -f 1-2)" \
+&& CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" \
+&& pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}" 
