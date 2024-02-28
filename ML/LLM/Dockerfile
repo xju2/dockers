@@ -42,3 +42,6 @@ RUN cd /tmp \
 		-Dminuit2=ON -Dgviz=ON -Drpath=ON -Dgnuinstall=OFF -DCMAKE_CXX_STANDARD=17 -Droot7=ON -Dxrootd=OFF -DPYTHON_EXECUTABLE=`which python` \
 	&& cmake --build . --target install -- -j4 \
 	&& cd  && rm -rf /tmp/root-* && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
+
+# install python packages
+RUN pip install hydra-core hydra-colorlog lightning torch numpy transformers datasets tiktoken wandb tqdm pyrootutils jupyterlab tensorboard wandb ruff pre-commit
