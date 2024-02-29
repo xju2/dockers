@@ -1,8 +1,8 @@
-# docexoty/centos7-atlasos
+# docexoty/alma9-atlasos
 # https://gitlab.cern.ch/atlas-sit/docker/-/blob/master/centos7-atlasos/Dockerfile
 # CC7 OS capable of using/running the ATLAS software release(s).
 
-FROM atlas/centos7-atlasos-dev
+FROM cern/alma9-base:latest
 
 USER root
 WORKDIR /root
