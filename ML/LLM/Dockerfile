@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
+# docexoty/llm:latest
 FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu20.04
 
 # ROOT core dependences.
@@ -45,3 +46,4 @@ RUN cd /tmp \
 
 # install python packages
 RUN pip install hydra-core hydra-colorlog lightning torch numpy transformers datasets tiktoken wandb tqdm pyrootutils jupyterlab tensorboard wandb ruff pre-commit
+RUN pip install matplotlib seaborn
