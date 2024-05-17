@@ -1,4 +1,4 @@
-# docexoty/exatrkx:cuda12-pytorch2.1
+# docexoty/exatrkx:cuda12-pytorch2.3
 FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu20.04
 
 # ROOT core dependences.
@@ -45,14 +45,16 @@ RUN source activate $CONDA_ENV_NAME && \
 		sympy filelock networkx jinja2 fsspec psutil && \
     conda install -y -c pytorch magma-cuda121
 
+ENV TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6"
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64:/usr/lib64/mpich/lib:/usr/local/lib
+
 # Get pytorch source and build so that it runs on different GPUs.
 RUN source activate $CONDA_ENV_NAME && cd /tmp && \
 	git clone --recursive https://github.com/pytorch/pytorch.git && cd pytorch && \
-	git checkout -b r2.1 origin/release/2.1 && \
+	git checkout -b r2.3 origin/release/2.3 && \
 	git submodule sync && git submodule update --init --recursive --jobs 0 && \
 	MAX_JOBS=4 USE_CUDA=1 BUILD_TEST=0 USE_FBGEMM=0 USE_QNNPACK=0 USE_DISTRIBUTED=1 BUILD_CAFFE2=0 DEBUG=0 \
-	  CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"} \
-	  TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6" python setup.py install && \
+	  CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"} python setup.py install && \
 	rm -rf /tmp/pytorch
 
 # FRNN
@@ -68,7 +70,7 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp/ \
 		python setup.py install && \
 	rm -rf /tmp/prefix_sum && rm -rf /tmp/FRNN
 
-ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64:/usr/lib64/mpich/lib:/usr/local/lib:/opt/conda/envs/gnn4itk/lib/python3.9/site-packages/torch/lib
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/conda/envs/gnn4itk/lib/python3.9/site-packages/torch/lib
 
 # additional Python package needed for acorn
 RUN source activate ${CONDA_ENV_NAME} && pip install git+https://github.com/LAL/trackml-library.git \
@@ -80,16 +82,24 @@ RUN source activate $CONDA_ENV_NAME && pip install \
     --extra-index-url=https://pypi.nvidia.com \
     cudf-cu12 cugraph-cu12 nx-cugraph-cu12
 
-ENV TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6"
-
-# # torch scatter
+# torch scatter
 RUN source activate $CONDA_ENV_NAME && cd /tmp/ && mkdir src \
 	&& wget https://github.com/rusty1s/pytorch_scatter/archive/refs/tags/2.1.2.tar.gz -O- | tar -xz --strip-components=1 --directory src \
 	&& cd src && FORCE_CUDA=1 pip install torch-scatter && rm -rf /tmp/src
 
+# torch sparse
+RUN source activate $CONDA_ENV_NAME && cd /tmp/ && mkdir src \
+	&& wget https://github.com/rusty1s/pytorch_sparse/archive/refs/tags/0.6.18.tar.gz -O- | tar -xz --strip-components=1 --directory src \
+	&& cd src && FORCE_CUDA=1 pip install torch-sparse && rm -rf /tmp/src
+
+# torch cluster
+RUN source activate $CONDA_ENV_NAME && cd /tmp/ && mkdir src \
+	&& wget https://github.com/rusty1s/pytorch_cluster/archive/refs/tags/1.6.3.tar.gz -O- | tar -xz --strip-components=1 --directory src \
+	&& cd src && FORCE_CUDA=1 pip install torch-cluster && rm -rf /tmp/src
+
 # pyg and lightning
 RUN source activate $CONDA_ENV_NAME \
-  && pip install torch_geometric lightning
+  && pip install torch_geometric lightning>=2.2
 
 # # ACORN
 # RUN source activate ${CONDA_ENV_NAME} && mkdir /code/ && cd /code \
@@ -107,12 +117,12 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp \
 	&& cmake --build . --target install -- -j4 \
 	&& cd  && rm -rf /tmp/root-* && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
 
-RUN source activate $CONDA_ENV_NAME && pip install hydra-core==1.2.0 hydra-colorlog==1.2.0 hydra-optuna-sweeper==1.2.0  pyrootutils pre-commit rich pytest
+# RUN source activate $CONDA_ENV_NAME && pip install hydra-core==1.2.0 hydra-colorlog==1.2.0 hydra-optuna-sweeper==1.2.0  pyrootutils pre-commit rich pytest
 
-# install airflow
-ENV AIRFLOW_HOME $HOME/airflow
-ENV AIRFLOW_VERSION 2.8.1
-RUN source activate $CONDA_ENV_NAME \
-&& PYTHON_VERSION="$(python --version | cut -d " " -f 2 | cut -d "." -f 1-2)" \
-&& CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" \
-&& pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}" 
+# # install airflow
+# ENV AIRFLOW_HOME $HOME/airflow
+# ENV AIRFLOW_VERSION 2.8.1
+# RUN source activate $CONDA_ENV_NAME \
+# && PYTHON_VERSION="$(python --version | cut -d " " -f 2 | cut -d "." -f 1-2)" \
+# && CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" \
+# && pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}" 
