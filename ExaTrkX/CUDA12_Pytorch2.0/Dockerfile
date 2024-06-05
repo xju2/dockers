@@ -23,6 +23,7 @@ RUN apt-get update -y  && apt-get -y install python3-dev python3-pip python3-sph
 	valgrind
 
 ENV CONDA_DIR /opt/conda
+ENV PYTHONNOUSERSITE=True
 # Make RUN commands use `bash --login`
 SHELL ["/bin/bash", "--login", "-c"]
 
@@ -33,16 +34,16 @@ RUN wget \
 
 ENV PATH=${CONDA_DIR}/bin:$PATH
 
-ARG CONDA_ENV_NAME=gnn4itk
+ENV CONDA_ENV_NAME=gnn4itk
 # create the environment
-RUN source activate && conda create -y -n $CONDA_ENV_NAME python=3.9
+RUN source activate && conda create -y -n $CONDA_ENV_NAME python=3.10
 
 RUN source activate $CONDA_ENV_NAME && conda update -n base -c defaults conda    
 
 RUN source activate $CONDA_ENV_NAME && \
     conda install -y astunparse charset-normalizer pycparser numpy ninja pyyaml mkl mkl-include setuptools cmake \
         cffi typing_extensions future six requests dataclasses \
-		sympy filelock networkx jinja2 fsspec psutil && \
+		sympy filelock networkx jinja2 fsspec psutil conda-pack && \
     conda install -y -c pytorch magma-cuda121
 
 ENV TORCH_CUDA_ARCH_LIST="6.1 7.0 7.5 8.0 8.6"
