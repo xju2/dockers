@@ -118,6 +118,12 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp \
 	&& cmake --build . --target install -- -j4 \
 	&& cd  && rm -rf /tmp/root-* && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
 
+ARG CMAKE_VERSION=3.29.6
+RUN source activate $CONDA_ENV_NAME && cd /tmp \
+    && wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-x86_64.sh \
+    && bash cmake-${CMAKE_VERSION}-linux-x86_64.sh --prefix=${CONDA_PREFIX} --exclude-subdir --skip-license \
+	&& rm -rf /tmp/*
+
 # RUN source activate $CONDA_ENV_NAME && pip install hydra-core==1.2.0 hydra-colorlog==1.2.0 hydra-optuna-sweeper==1.2.0  pyrootutils pre-commit rich pytest
 
 # # install airflow
