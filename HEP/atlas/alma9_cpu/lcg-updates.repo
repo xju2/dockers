@@ -1,0 +1,6 @@
+[lcg-updates]
+name=LCG Updates Repository
+baseurl=http://cern.ch/lcgpackages/rpms_updates
+gpgcheck=0
+enabled=0
+protect=0

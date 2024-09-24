@@ -1,0 +1,6 @@
+[lcg]
+name=LCG Common Repository
+baseurl=http://cern.ch/lcgpackages/rpms
+gpgcheck=0
+enabled=0
+protect=0

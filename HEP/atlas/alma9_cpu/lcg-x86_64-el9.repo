@@ -1,0 +1,6 @@
+[lcg-x86_64-el9]
+name=LCG EL9 Repository
+baseurl=http://cern.ch/lcgpackages/lcg/repo/9/x86_64/Packages
+gpgcheck=0
+enabled=1
+protect=0

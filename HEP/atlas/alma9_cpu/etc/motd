@@ -1,0 +1,13 @@
+             _ _____ _      _   ___
+            /_\_   _| |    /_\ / __|
+           / _ \| | | |__ / _ \\__ \
+          /_/ \_\_| |____/_/ \_\___/
+
+This is the AlmaLinux OS 9 ATLAS offline software development image.
+It provides all the software for using/developing an ATLAS
+release from/on CVMFS directly.
+
+To start setting up your runtime environment, execute:
+
+   setupATLAS
+

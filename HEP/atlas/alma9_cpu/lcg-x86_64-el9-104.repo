@@ -1,0 +1,6 @@
+[lcg-x86_64-el9-104]
+name=LCG EL9 Release 104 Repository
+baseurl=http://cern.ch/lcgpackages/lcg/repo/9/x86_64/LCG_104/
+gpgcheck=0
+enabled=1
+protect=0
