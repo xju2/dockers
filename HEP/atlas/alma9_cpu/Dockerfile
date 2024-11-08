@@ -23,16 +23,17 @@ RUN dnf --refresh -y install \
       libX11-devel libXpm-devel libXft-devel libXext-devel \
       libaio libnsl openssl-devel glibc-devel rpm-build nano sudo \
       ${GCCPACKAGES} \
+      libXi-devel gmp-devel \
+      mesa-libGL-devel mesa-libGLU-devel mesa-libEGL-devel \
+      libcurl-devel man-db libuuid-devel \
+      libaio-devel expat-devel libtirpc-devel \
+      libjpeg-turbo libpng libtiff \
  && ln -s /opt/lcg/gcc/${GCCVERSION}/x86_64-el9 /opt/lcg/gcc/x86_64-el9 \
- && dnf clean all \
- && wget https://cmake.org/files/v3.27/cmake-3.27.5-linux-x86_64.tar.gz \
- && mkdir -p /opt/cmake/3.27.5/Linux-x86_64 \
- && tar -C /opt/cmake/3.27.5/Linux-x86_64 --strip-components=1 \
-        --no-same-owner -xvf cmake-*-linux-x86_64.tar.gz \
- && rm cmake-*-linux-x86_64.tar.gz
+ && ln -s /usr/lib64/libsystemd.so.0.35.0 /usr/lib64/libsystemd.so \
+ && dnf clean all 
 
 # Copy the environment setup script(s) in place:
-COPY atlas_prompt.sh cmake-3.27.5.sh /etc/profile.d/
+COPY atlas_prompt.sh /etc/profile.d/
 
 # Set up the ATLAS user, and give it super user rights.
 RUN echo '%wheel	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers \
@@ -49,20 +50,6 @@ RUN echo '%wheel	ALL=(ALL)	NOPASSWD: ALL' >> /etc/sudoers \
 # runtimes (such as docker) missing mountpoints
 # are created on demand. I hope we can remove this soon.
 RUN mkdir -p /alrb /cvmfs /afs /eos
-
-# 1. Install all the packages needed for ATLAS software development.
-# 2. Install ninja
-RUN dnf --refresh -y install libXi-devel gmp-devel \
-      mesa-libGL-devel mesa-libGLU-devel mesa-libEGL-devel \
-      libcurl-devel man-db libuuid-devel \
-      libaio-devel expat-devel libtirpc-devel \
-      libjpeg-turbo libpng libtiff \
- && dnf clean all \
- && wget https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-linux.zip \
- && mkdir -p /opt/ninja/1.11.1/Linux-x86_64 \
- && unzip ninja-linux.zip -d /opt/ninja/1.11.1/Linux-x86_64 \
- && chmod 755 /opt/ninja/*/Linux-x86_64/ninja \
- && rm ninja-linux.zip
 
 # Put the environment setup scripts in place.
 COPY etc/*.sh /etc/profile.d/
