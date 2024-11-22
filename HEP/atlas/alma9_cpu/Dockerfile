@@ -21,7 +21,7 @@ ARG GCCVERSION=14.2.0
 RUN dnf --refresh -y install \
       --disablerepo=tdaq* --disablerepo=atlas* --disablerepo=lcg-x86_64-el9* \
       which git wget atlas-devel make \
-      libX11-devel libXpm-devel libXft-devel libXext-devel \
+      libX11-devel libXpm-devel libXft-devel libXext-devel motif-devel \
       libaio libnsl openssl-devel glibc-devel rpm-build nano sudo \
       ${GCCPACKAGES} \
       libXi-devel gmp-devel \
