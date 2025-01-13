@@ -28,10 +28,15 @@ RUN dnf --refresh -y install \
       mesa-libGL-devel mesa-libGLU-devel mesa-libEGL-devel \
       libcurl-devel man-db libuuid-devel \
       libaio-devel expat-devel libtirpc-devel \
-      libjpeg-turbo libpng libtiff vim \
+      libjpeg-turbo libpng libtiff vim libzstd-devel \
  && ln -s /opt/lcg/gcc/${GCCVERSION}/x86_64-el9 /opt/lcg/gcc/x86_64-el9 \
  && ln -s /usr/lib64/libsystemd.so.0.35.0 /usr/lib64/libsystemd.so \
  && dnf clean all 
+
+RUN yum -y install --disablerepo=tdaq* --disablerepo=atlas* --disablerepo=lcg-x86_64-el9* \
+    https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-repo-1.0.0-1.el9.noarch.rpm \
+    && yum -y install --disablerepo=tdaq* --disablerepo=atlas* --disablerepo=lcg-x86_64-el9* \
+    HEP_OSlibs
 
  RUN  wget https://cmake.org/files/v3.29/cmake-3.29.5-linux-x86_64.tar.gz \
  && mkdir -p /opt/cmake/3.29.5/Linux-x86_64 \
@@ -80,7 +85,3 @@ ENV PYTHONPATH=${PYTHONPATH}:${PYTHONUSERBASE}/lib/python3.11/site-packages/
 # Start the image with BASH by default, after having printed the message
 # of the day.
 CMD cat /etc/motd && /bin/bash
-
-RUN mkdir -p /home/atlas/install /home/atlas/code && cd /home/atlas/code \
-  && wget https://github.com/Tencent/rapidjson/archive/refs/tags/v1.1.0.tar.gz && tar -xzvf v1.1.0.tar.gz \
-  && cd rapidjson-1.1.0 && cp -r include /home/atlas/install/ && cd .. && rm -rf v1.1.0.tar.gz

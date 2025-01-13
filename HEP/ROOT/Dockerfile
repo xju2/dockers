@@ -8,4 +8,6 @@ RUN cd /opt && python -m venv venv
 RUN mkdir /opt/code
 RUN cd /opt/code && . /opt/venv/bin/activate \
   && git clone https://github.com/xju2/root_plot_utils.git \
-  && cd root_plot_utils  &&  pip install . 
+  && cd root_plot_utils  \
+  && git checkout tags/v1.1.0 -b v1.1.0 \
+  &&  pip install . 
