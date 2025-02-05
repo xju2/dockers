@@ -131,5 +131,5 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp \
 	&& cmake --build . --target install -- -j16 \
 	&& cd  && rm -rf /tmp/root-* && echo "source /usr/local/root/bin/thisroot.sh" >> ~/.bashrc
 
-RUN source activate $CONDA_ENV_NAME && pip install hydra-core hydra-colorlo hydra-optuna-sweeper \
+RUN source activate $CONDA_ENV_NAME && pip install hydra-core hydra-colorlog hydra-optuna-sweeper \
     pyrootutils pre-commit rich pytest onnx onnxruntime onnxscript
