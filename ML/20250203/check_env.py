@@ -65,6 +65,12 @@ def check():
         print("cudf not found")
 
     try:
+        import mpi4py
+        print("mpi4py: ", mpi4py.__version__)
+    except ImportError:
+        print("mpi4py not found")
+
+    try:
         import torch_scatter
 
         print("torch_scatter: ", torch_scatter.__version__)

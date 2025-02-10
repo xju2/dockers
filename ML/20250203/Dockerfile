@@ -133,3 +133,8 @@ RUN source activate $CONDA_ENV_NAME && cd /tmp \
 
 RUN source activate $CONDA_ENV_NAME && pip install hydra-core hydra-colorlog hydra-optuna-sweeper \
     pyrootutils pre-commit rich pytest onnx onnxruntime onnxscript
+
+# install mpi4py
+RUN source activate $CONDA_ENV_NAME \
+    && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu \
+	&& pip install mpi4py
