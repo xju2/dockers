@@ -18,6 +18,7 @@ frnn found
 cugraph:  24.12.00
 cudf:  24.12.00
 mpi4py:  4.0.2
+h5py:  3.12.1
 torch_scatter:  2.1.2
 Test scatter_max in cuda.
 out: tensor([[0, 0, 4, 3, 2, 0],

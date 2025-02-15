@@ -71,6 +71,12 @@ def check():
         print("mpi4py not found")
 
     try:
+        import h5py
+        print("h5py: ", h5py.__version__)
+    except ImportError:
+        print("h5py not found")
+
+    try:
         import torch_scatter
 
         print("torch_scatter: ", torch_scatter.__version__)

@@ -138,3 +138,7 @@ RUN source activate $CONDA_ENV_NAME && pip install hydra-core hydra-colorlog hyd
 RUN source activate $CONDA_ENV_NAME \
     && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu \
 	&& pip install mpi4py
+
+# install h5py
+RUN source activate $CONDA_ENV_NAME \
+	&& pip install h5py
