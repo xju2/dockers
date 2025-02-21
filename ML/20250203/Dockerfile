@@ -141,4 +141,4 @@ RUN source activate $CONDA_ENV_NAME \
 
 # install h5py
 RUN source activate $CONDA_ENV_NAME \
-	&& pip install h5py
+	&& pip install h5py pybind11
