@@ -1,0 +1,20 @@
+[tdaq-testing]
+name=Non-official updates and patches for tdaq releases
+baseurl=http://cern.ch/atlas-tdaq-sw/yum/tdaq/testing
+gpgcheck=0
+enabled=1
+protect=0
+
+[dqm-common-testing]
+name=Non-official updates and patches for dqm-common releases
+baseurl=http://cern.ch/atlas-tdaq-sw/yum/dqm-common/testing
+gpgcheck=0
+enabled=1
+protect=0
+
+[tdaq-common-testing]
+name=Non-official updates and patches for tdaq-common releases
+baseurl=http://cern.ch/atlas-tdaq-sw/yum/tdaq-common/testing
+gpgcheck=0
+enabled=1
+protect=0

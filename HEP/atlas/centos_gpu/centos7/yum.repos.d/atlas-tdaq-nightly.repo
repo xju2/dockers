@@ -1,0 +1,6 @@
+[tdaq-nightly]
+name=Nightly snapshots of TDAQ releases
+baseurl=http://cern.ch/atlas-tdaq-sw/yum/tdaq/nightly
+gpgcheck=0
+enabled=1
+protect=0

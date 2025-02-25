@@ -1,0 +1,6 @@
+[lcg-contrib]
+name=LCG Contrib Repository
+baseurl=http://cern.ch/lcgpackages/lcg/contrib/7/
+gpgcheck=0
+enabled=1
+protect=0

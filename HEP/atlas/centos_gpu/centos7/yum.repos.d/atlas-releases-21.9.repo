@@ -1,0 +1,6 @@
+[atlas-releases-21.9]
+name=ATLAS offline/analysis releases in the 21.9 series
+baseurl=http://cern.ch/atlas-software-dist-eos/RPMs/releases/21.9
+gpgcheck=0
+enabled=1
+protect=0

@@ -1,0 +1,27 @@
+[tdaq-common-centos7]
+name=tdaq-common releases
+baseurl=http://cern.ch/atlas-tdaq-sw/yum/tdaq-common/centos7
+gpgcheck=0
+enabled=1
+protect=0
+
+[dqm-common-centos7]
+name=dqm-common releases
+baseurl=http://cern.ch/atlas-tdaq-sw/yum/dqm-common/centos7
+gpgcheck=0
+enabled=1
+protect=0
+
+[tdaq-centos7]
+name=TDAQ releases
+baseurl=http://cern.ch/atlas-tdaq-sw/yum/tdaq/centos7
+gpgcheck=0
+enabled=1
+protect=0
+
+[tdaq-external]
+name=TDAQ external sw
+baseurl=http://cern.ch/atlas-tdaq-sw/yum/external
+gpgcheck=0
+enabled=1
+protect=0
