@@ -1,6 +1,0 @@
-[lcg-97]
-name=LCG Repository
-baseurl=http://cern.ch/lcgpackages/lcg/repo/7/LCG_97/
-gpgcheck=0
-enabled=1
-protect=0

@@ -1,6 +1,0 @@
-[atlas-releases-slc6]
-name=ATLAS offline/analysis releases for SLC6
-baseurl=http://cern.ch/atlas-software-dist-eos/RPMs/releases/slc6
-gpgcheck=0
-enabled=1
-protect=0

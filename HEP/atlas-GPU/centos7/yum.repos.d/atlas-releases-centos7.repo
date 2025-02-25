@@ -1,6 +1,0 @@
-[atlas-releases-centos7]
-name=ATLAS offline/analysis releases for CentOS7
-baseurl=http://cern.ch/atlas-software-dist-eos/RPMs/releases/centos7
-gpgcheck=0
-enabled=1
-protect=0

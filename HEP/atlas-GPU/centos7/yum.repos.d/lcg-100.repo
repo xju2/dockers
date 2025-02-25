@@ -1,6 +1,0 @@
-[lcg-100]
-name=LCG Repository
-baseurl=http://cern.ch/lcgpackages/lcg/repo/7/LCG_100/
-gpgcheck=0
-enabled=1
-protect=0
