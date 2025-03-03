@@ -141,4 +141,5 @@ RUN source activate $CONDA_ENV_NAME \
 
 # install h5py
 RUN source activate $CONDA_ENV_NAME \
-	&& pip install h5py pybind11
+	&& pip install h5py pybind11 particle plotly scikit-learn scikit-build-core \
+	&& pip install --extra-index-url=https://pypi.nvidia.com cuml-cu12

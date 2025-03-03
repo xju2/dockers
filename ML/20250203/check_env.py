@@ -9,6 +9,16 @@ cugraph
 torch_scatter
 """
 
+import importlib.util
+import importlib
+
+def _check_module(module_name: str):
+    try:
+        module = importlib.import_module(module_name)
+        version = getattr(module, "__version__", None)
+        print(f"{module_name} found: ", version)
+    except ImportError:
+        print(f"{module_name} not found")
 
 def check():
     # python interpreter
@@ -28,53 +38,12 @@ def check():
     except ImportError:
         print("torch not found")
 
-    try:
-        import lightning
-
-        print("lightning: ", lightning.__version__)
-    except ImportError:
-        print("lightning not found")
-
-    try:
-        import torch_geometric
-
-        print("pyg: ", torch_geometric.__version__)
-    except (ImportError, OSError) as error:
-        print(error)
-        print("pyg not found")
-
-    try:
-        import frnn  # noqa
-
-        print("frnn found")
-    except ImportError:
-        print("[Optional] frnn not found")
-
-    try:
-        import cugraph
-
-        print("cugraph: ", cugraph.__version__)
-    except ImportError:
-        print("cugraph not found")
-
-    try:
-        import cudf
-
-        print("cudf: ", cudf.__version__)
-    except ImportError:
-        print("cudf not found")
-
-    try:
-        import mpi4py
-        print("mpi4py: ", mpi4py.__version__)
-    except ImportError:
-        print("mpi4py not found")
-
-    try:
-        import h5py
-        print("h5py: ", h5py.__version__)
-    except ImportError:
-        print("h5py not found")
+    models = ["lightning", "torch_geometric", "frnn", 
+              "cugraph", "cudf", "cuml", 
+              "mpi4py", 
+              "h5py", "torch_scatter"]
+    for model in models:
+        _check_module(model)
 
     try:
         import torch_scatter
