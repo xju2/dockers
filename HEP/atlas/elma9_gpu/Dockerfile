@@ -1,4 +1,4 @@
-# docexoty/rocky-atlasos-dev-gpu:latest
+# docexoty/el9-atlasos-dev-gpu:latest
 # 
 
 # Set up the NVIDIA CUDA 12.4.1 and cuDNN
@@ -53,7 +53,12 @@ RUN mkdir /home/atlas/python3.11
 ENV PYTHONUSERBASE="/home/atlas/python3.11"
 ENV PATH=${PYTHONUSERBASE}/bin:$PATH
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PYTHONUSERBASE}/lib:${PYTHONUSERBASE}/lib/python3.11/site-packages/lib
-ENV PYTHONPATH=${PYTHONPATH}:${PYTHONUSERBASE}/lib/python3.11/site-packages/
+ENV PYTHONPATH=${PYTHONPATH}:${PYTHONUSERBASE}/lib/python3.11/site-packages
+
+# install some python packages.
+RUN pip install --upgrade pip \
+    && pip install wheel \
+    && pip3 install torch torchvision torchaudio tensorrt --user --index-url https://download.pytorch.org/whl/cu128 
 
 # Start the image with BASH by default, after having printed the message
 # of the day.
