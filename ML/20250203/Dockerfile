@@ -139,7 +139,7 @@ RUN source activate $CONDA_ENV_NAME \
     && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu \
 	&& pip install mpi4py
 
-# install h5py
 RUN source activate $CONDA_ENV_NAME \
-	&& pip install h5py pybind11 particle plotly scikit-learn scikit-build-core \
-	&& pip install --extra-index-url=https://pypi.nvidia.com cuml-cu12
+	&& pip install h5py pybind11 particle plotly scikit-learn \
+	&& pip install --extra-index-url=https://pypi.nvidia.com cuml-cu12 particle plotly scikit-learn scikit-build-core 
+
