@@ -46,9 +46,6 @@ COPY etc/*.sh /etc/profile.d/
 USER atlas
 WORKDIR /workdir
 
-# Install the AtlasSetup configuration file.
-COPY etc/.asetup /home/atlas/
-
 # Copy the updated motd
 COPY etc/motd /etc/
 
