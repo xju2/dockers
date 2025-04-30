@@ -17,7 +17,7 @@ RUN yum -y erase zsh && yum -y update \
  && yum clean all
 RUN yum-config-manager --add-repo "https://storage-ci.web.cern.ch/storage-ci/eos/diopside-depend/el-9/x86_64/" \
  && yum-config-manager --add-repo "https://storage-ci.web.cern.ch/storage-ci/eos/diopside/tag/testing/el-9/x86_64/"
-RUN yum -y --nogpgcheck install eos-client eos-fusex && yum clean all
+RUN yum -y --nogpgcheck install eos-client eos-fusex vim sudo && yum clean all
 
 
 # Copy the environment setup script(s) in place:
@@ -42,6 +42,17 @@ RUN mkdir -p /alrb /cvmfs /afs /eos
 # Put the environment setup scripts in place.
 COPY etc/*.sh /etc/profile.d/
 
+RUN yum -y install python3.11 python3.11-pip 
+RUN rm /usr/bin/pip /usr/bin/pip3.9 /usr/bin/pip3 /usr/bin/pip-3.9 /usr/bin/python3.9 /usr/bin/python3 \
+  && ln -s /usr/bin/pip3.11 /usr/bin/pip \
+  && ln -s /usr/bin/python3.11 /usr/bin/python3 \
+  && pip install --upgrade --user pip
+
+RUN cd /opt && \
+    wget https://download.pytorch.org/libtorch/cu128/libtorch-cxx11-abi-shared-with-deps-2.7.0%2Bcu128.zip && \
+    unzip libtorch-cxx11-abi-shared-with-deps-2.7.0+cu128.zip && \
+    rm libtorch-cxx11-abi-shared-with-deps-2.7.0+cu128.zip
+
 # Switch back to the ATLAS user.
 USER atlas
 WORKDIR /workdir
@@ -55,10 +66,8 @@ ENV PATH=${PYTHONUSERBASE}/bin:$PATH
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PYTHONUSERBASE}/lib:${PYTHONUSERBASE}/lib/python3.11/site-packages/lib
 ENV PYTHONPATH=${PYTHONPATH}:${PYTHONUSERBASE}/lib/python3.11/site-packages
 
-# install some python packages.
-RUN pip install --upgrade pip \
-    && pip install wheel \
-    && pip3 install torch torchvision torchaudio tensorrt --user --index-url https://download.pytorch.org/whl/cu128 
+# RUN pip install --user wheel \
+#     && pip install --user torch torchvision torchaudio tensorrt  torch-tensorrt
 
 # Start the image with BASH by default, after having printed the message
 # of the day.
