@@ -7,6 +7,7 @@ pyg
 frnn
 cugraph
 torch_scatter
+ROOT
 """
 
 
@@ -84,6 +85,11 @@ def check():
     except ImportError:
         print("torch_scatter not found")
 
+    try: 
+        import ROOT
+        print("ROOT: ", ROOT.__version__)
+    except ImportError:
+        print("ROOT not found")
 
 if __name__ == "__main__":
     check()

@@ -39,8 +39,9 @@ ENV CONDA_ENV_NAME=gnn4itk
 # create the environment
 RUN source activate && conda create -y -n $CONDA_ENV_NAME python=3.12  
 
+# && pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 torch-tensorrt tensorrt --extra-index-url https://download.pytorch.org/whl/cu126 \
 RUN source activate $CONDA_ENV_NAME \
-	&& pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 torch-tensorrt tensorrt  --index-url https://download.pytorch.org/whl/cu126 \
+	&& python -m pip install torch==2.6.0 torch-tensorrt tensorrt --extra-index-url https://download.pytorch.org/whl/cu126 \
 	&& pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.6.0+cu126.html \
 	&& pip install torch_geometric lightning\
 	&& pip install --extra-index-url=https://pypi.nvidia.com cudf-cu12 cugraph-cu12 nx-cugraph-cu12 \
@@ -53,12 +54,15 @@ RUN source activate $CONDA_ENV_NAME && conda install conda-forge::root
 
 # FRNN
 ENV PYTHONNOUSERSITE=True
+ENV TORCH_CUDA_ARCH_LIST="8.0"
+
 RUN source activate $CONDA_ENV_NAME && cd /tmp/ \
 	&& git clone https://github.com/asnaylor/prefix_sum.git \
     && git clone https://github.com/xju2/FRNN.git \
 	&& cd prefix_sum \
-	&& NVCC_FLAGS="--std=c++17" python setup.py install \
+	&& NVCC_FLAGS="--std=c++17" CXX=/usr/bin/gcc python setup.py install \
     && cd /tmp/FRNN \
-    && NVCC_FLAGS="--std=c++17" python setup.py install && \
+    && NVCC_FLAGS="--std=c++17" CXX=/usr/bin/gcc python setup.py install && \
 	rm -rf /tmp/prefix_sum && rm -rf /tmp/FRNN
 
+CMD ["bash", "-c", "source activate $CONDA_ENV_NAME && /bin/bash"]
